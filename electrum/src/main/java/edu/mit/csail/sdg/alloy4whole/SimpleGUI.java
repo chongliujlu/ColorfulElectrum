@@ -1101,6 +1101,30 @@ public final class SimpleGUI implements ComponentListener, Listener {
         log.flush();
         return null;
     }
+        
+    private Runner paintYesBlue() {
+        if (wrap) return wrapMe();
+        text.paint(new Color(140, 180, 255), false);
+    	return null;
+    }
+
+    private Runner paintYesRed() {
+        if (wrap) return wrapMe();
+        text.paint(new Color(255, 140, 160), false);
+    	return null;
+    }
+    
+    private Runner paintFalseBlue() {
+        if (wrap) return wrapMe();
+        text.paint(new Color(140, 180, 255), true);
+    	return null;
+    }
+
+    private Runner paintFalseRed() {
+        if (wrap) return wrapMe();
+        text.paint(new Color(255, 140, 160), true);
+    	return null;
+    }
 
     //===============================================================================================================//
 
@@ -1394,11 +1418,11 @@ public final class SimpleGUI implements ComponentListener, Listener {
                 Util.close(is);
             }
             text.clearShade();
-            text.shade(hCore.b, subCoreColor, false);
-            text.shade(hCore.a, coreColor, false);
+            text.shade(hCore.b, subCoreColor, false, false);
+            text.shade(hCore.a, coreColor, false, false);
             // shade again, because if not all files were open, some shadings will have no effect
-            text.shade(hCore.b, subCoreColor, false);
-            text.shade(hCore.a, coreColor, false);
+            text.shade(hCore.b, subCoreColor, false, false);
+            text.shade(hCore.a, coreColor, false, false);
         }
         if (arg.startsWith("POS: ")) { // POS: x1 y1 x2 y2 filename
             Scanner s=new Scanner(arg.substring(5));
@@ -1699,6 +1723,11 @@ public final class SimpleGUI implements ComponentListener, Listener {
         viz = new VizGUI(false, "", windowmenu2, enumerator, evaluator);
         viz.doSetFontSize(FontSize.get());
 
+        // Create the text area
+        text = new OurTabbedSyntaxWidget(fontName, fontSize, TabSize.get());
+        text.listeners.add(this);
+        text.enableSyntax(! SyntaxDisabled.get());
+
         // Create the toolbar
         try {
             wrap = true;
@@ -1713,6 +1742,10 @@ public final class SimpleGUI implements ComponentListener, Listener {
             toolbar.add(stopbutton=OurUtil.button("Stop", "Stops the current analysis", "images/24_execute_abort2.gif", doStop(2)));
             stopbutton.setVisible(false);
             toolbar.add(showbutton=OurUtil.button("Show", "Shows the latest instance", "images/24_graph.gif", doShowLatest()));
+            toolbar.add(OurUtil.button("RED", "Paint Red", "images/red.gif", paintYesRed()));
+            toolbar.add(OurUtil.button("BLUE", "Paint Blue", "images/blue.gif", paintYesBlue()));
+            toolbar.add(OurUtil.button("!RED", "Paint !Red", "images/red.gif", paintFalseRed()));
+            toolbar.add(OurUtil.button("!BLUE", "Paint !Blue", "images/blue.gif", paintFalseBlue()));
             toolbar.add(Box.createHorizontalGlue());
             toolbar.setBorder(new OurBorder(false,false,false,false));
         } finally {
@@ -1729,10 +1762,6 @@ public final class SimpleGUI implements ComponentListener, Listener {
         // Create loggers for preference changes
         PreferencesDialog.logOnChange(log, A4Preferences.allUserPrefs().toArray(new Pref<?>[0]));
 
-        // Create the text area
-        text = new OurTabbedSyntaxWidget(fontName, fontSize, TabSize.get());
-        text.listeners.add(this);
-        text.enableSyntax(! SyntaxDisabled.get());
 
         // Add everything to the frame, then display the frame
         Container all=frame.getContentPane();

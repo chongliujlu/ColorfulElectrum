@@ -167,9 +167,9 @@ public final class OurSyntaxWidget {
    void clearShade() { pane.getHighlighter().removeAllHighlights(); }
 
    /** Shade the range of text from start (inclusive) to end (exclusive). */
-   void shade(Color color, int start, int end) {
+   void shade(Color color, boolean strike, int start, int end) {
       int c = color.getRGB() & 0xFFFFFF;
-      if (painter==null || (painter.color.getRGB() & 0xFFFFFF)!=c)  painter = new OurHighlighter(color);
+      if (painter==null || (painter.color.getRGB() & 0xFFFFFF)!=c)  painter = new OurHighlighter(color,strike);
       try { pane.getHighlighter().addHighlight(start, end, painter); } catch(Throwable ex) { } // exception is okay
    }
 
@@ -301,4 +301,12 @@ public final class OurSyntaxWidget {
 
    /** Transfer focus to this component. */
    public void requestFocusInWindow() { if (pane!=null) pane.requestFocusInWindow(); }
+   
+   public Pos getPosSelected() {
+	   int y1 = 1+getLineOfOffset(pane.getSelectionStart());
+	   int y2 = 1+getLineOfOffset(pane.getSelectionEnd());
+	   int x1 = 1+pane.getSelectionStart()-getLineStartOffset(y1-1);
+	   int x2 = pane.getSelectionEnd()-getLineStartOffset(y2-1);
+	   return new Pos(getFilename(), x1, y1, x2, y2);
+   }
 }
