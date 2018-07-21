@@ -107,6 +107,28 @@ public final class OurConsole extends JScrollPane {
       return s;
    }
 
+   static MutableAttributeSet style(String fontName, int fontSize, boolean boldness, Color color, int leftIndent, int n) {
+	      MutableAttributeSet s = new SimpleAttributeSet();
+	      StyleConstants.setFontFamily(s, fontName);
+	      StyleConstants.setFontSize(s, fontSize);
+	      StyleConstants.setBold(s, boldness);
+	      StyleConstants.setForeground(s, color);
+	      StyleConstants.setLeftIndent(s, leftIndent);
+	      if (n > 0) {
+	    	  if (n == 1) StyleConstants.setBackground(s, new Color(240,195,195));
+	    	  else if (n == 2) StyleConstants.setBackground(s, new Color(206,215,242));
+	    	  else if (n == 3) StyleConstants.setBackground(s, new Color(204, 255, 153));
+	    	  else if (n == 4) StyleConstants.setBackground(s, new Color(249,226,253));
+	      } else if (n < 0) {
+	    	  if (n == -1) s.addAttribute("strike-color", new Color(240,195,195));
+	    	  else if (n == -2) s.addAttribute("strike-color", new Color(206,215,242));
+	    	  else if (n == -3) s.addAttribute("strike-color", new Color(204, 255, 153));
+	    	  else if (n == -4) s.addAttribute("strike-color", new Color(249,226,253));
+	      }
+	      else StyleConstants.setBackground(s, new Color(255,255,255));
+	      return s;
+   }
+   
    /** Construct a JScrollPane that allows the user to interactively type in commands and see replies.
     *
     * @param computer - this object is used to evaluate the user input

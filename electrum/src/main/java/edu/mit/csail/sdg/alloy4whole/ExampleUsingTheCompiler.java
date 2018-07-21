@@ -56,7 +56,7 @@ public final class ExampleUsingTheCompiler {
                 System.out.flush();
             }
         };
-        String filename = "model.ele";
+        String filename = "/Users/nmm/Desktop/dummy.ele";
         //for(String filename:args) {
             // Parse+typecheck the model
             System.out.println("=========== Parsing+Typechecking "+filename+" =============");

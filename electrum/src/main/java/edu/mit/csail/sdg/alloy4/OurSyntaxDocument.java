@@ -48,6 +48,7 @@ class OurSyntaxDocument extends DefaultStyledDocument {
 
 	/** The "comment mode" at the start of each line (0 = no comment) (1 = block comment) (2 = javadoc comment) (-1 = unknown) */
 	private final List<Integer> comments = new ArrayList<Integer>();
+	private final List<Integer> colors = new ArrayList<Integer>();
 
 	/** Whether syntax highlighting is currently enabled or not. */
 	private boolean enabled = true;
@@ -65,19 +66,35 @@ class OurSyntaxDocument extends DefaultStyledDocument {
 	private final List<MutableAttributeSet> all = new ArrayList<MutableAttributeSet>();
 
 	/** The character style for regular text. */
-	private final MutableAttributeSet styleNormal  = style(font, fontSize, false, Color.BLACK, 0);          { all.add(styleNormal); }
-
+	private final MutableAttributeSet styleNormal  = style(font, fontSize, false, Color.BLACK, 0, 0);          { all.add(styleNormal); }
+	
+	private final MutableAttributeSet styleNormal(int n) { return style(font, fontSize, false, Color.BLACK, 0, n); }
+	
 	/** The character style for symbols. */
-	private final MutableAttributeSet styleSymbol  = style(font, fontSize, true, Color.BLACK, 0);           { all.add(styleSymbol); }
+	private final MutableAttributeSet styleSymbol  = style(font, fontSize, true, Color.BLACK, 0, 0);           { all.add(styleSymbol); }
+
+	private final MutableAttributeSet styleSymbol(int n) { return style(font, fontSize, true, Color.BLACK, 0, n);          }
 
 	/** The character style for integer constants. */
-	private final MutableAttributeSet styleNumber  = style(font, fontSize, true, new Color(0xA80A0A), 0);   { all.add(styleNumber); }
+	private final MutableAttributeSet styleNumber  = style(font, fontSize, true, new Color(0xA80A0A), 0, 0);   { all.add(styleNumber); }
+
+	private final MutableAttributeSet styleNumber(int n)  {return style(font, fontSize, true, new Color(0xA80A0A), 0, n); }
 
 	/** The character style for keywords. */
-	private final MutableAttributeSet styleKeyword = style(font, fontSize, true, new Color(0x1E1EA8), 0);   { all.add(styleKeyword); }
+	private final MutableAttributeSet styleKeyword = style(font, fontSize, true, new Color(0x1E1EA8), 0, 0);   { all.add(styleKeyword); }
+
+	private final MutableAttributeSet styleC1= style(font, fontSize, true, new Color(240,195,195), 0, 0);   { all.add(styleKeyword); }
+	private final MutableAttributeSet styleC2 = style(font, fontSize, true, new Color(206,215,242), 0, 0);   { all.add(styleKeyword); }
+	private final MutableAttributeSet styleC3 = style(font, fontSize, true, new Color(204, 255, 153), 0, 0);   { all.add(styleKeyword); }
+	private final MutableAttributeSet styleC4 = style(font, fontSize, true, new Color(249,226,253), 0, 0);   { all.add(styleKeyword); }
+
+	private final MutableAttributeSet styleKeyword(int n) { return style(font, fontSize, true, new Color(0x1E1EA8), 0, n);}
 
 	/** The character style for string literals. */
-	private final MutableAttributeSet styleString  = style(font, fontSize, false, new Color(0xA80AA8), 0);  { all.add(styleString); }
+	private final MutableAttributeSet styleString  = style(font, fontSize, false, new Color(0xA80AA8), 0, 0);  { all.add(styleString); }
+
+	private final MutableAttributeSet styleString(int n) { return style(font, fontSize, false, new Color(0xA80AA8), 0, n); }
+
 
 	/** The character style for up-to-end-of-line-style comment. */
 	private final MutableAttributeSet styleComment = style(font, fontSize, false, new Color(0x0A940A), 0);  { all.add(styleComment); }
@@ -113,6 +130,13 @@ class OurSyntaxDocument extends DefaultStyledDocument {
 		return (c>='A' && c<='Z') || (c>='a' && c<='z') || c=='$' || (c>='0' && c<='9') || c=='_' /*|| c=='\''*/ || c=='\"'; // [HASLab] primed expressions
 	}
 
+	private static final boolean do_color(char c) {
+		return (c>='①' && c<='④');
+	}
+	private static final boolean do_color2(char c) {
+		return (c>='❶' && c<='❹');
+	}
+	
 	/** Constructor. */
 	public OurSyntaxDocument(String fontName, int fontSize) {
 		putProperty(DefaultEditorKit.EndOfLineStringProperty, "\n");
@@ -158,10 +182,10 @@ class OurSyntaxDocument extends DefaultStyledDocument {
 		if (!enabled) { super.insertString(offset, string, styleNormal); return; }
 		int startLine = do_getLineOfOffset(offset);
 		for(int i = 0; i < string.length(); i++) { // For each inserted '\n' we need to shift the values in "comments" array down
-			if (string.charAt(i)=='\n') { if (startLine < comments.size()-1) comments.add(startLine+1, -1); }
+			if (string.charAt(i)=='\n') { if (startLine < comments.size()-1) comments.add(startLine+1, -1); if (startLine < colors.size()-1) colors.add(startLine+1, -1); }
 		}
 		super.insertString(offset, string, styleNormal);
-		try { do_update(startLine); } catch(Exception ex) { comments.clear(); }
+		try { do_update(startLine); } catch(Exception ex) { comments.clear(); colors.clear(); }
 	}
 
 	/** This method is called by Swing to delete text from this document. */
@@ -169,10 +193,10 @@ class OurSyntaxDocument extends DefaultStyledDocument {
 		if (!enabled) { super.remove(offset, length); return; }
 		int i = 0, startLine = do_getLineOfOffset(offset);
 		for(String oldText = toString(); i<length; i++) { // For each deleted '\n' we need to shift the values in "comments" array up
-			if (oldText.charAt(offset+i)=='\n') if (startLine < comments.size()-1) comments.remove(startLine+1);
+			if (oldText.charAt(offset+i)=='\n') { if (startLine < comments.size()-1) comments.remove(startLine+1); if (startLine < colors.size()-1) colors.remove(startLine+1); }
 		}
 		super.remove(offset, length);
-		try { do_update(startLine); } catch(Exception ex) { comments.clear(); }
+		try { do_update(startLine); } catch(Exception ex) { comments.clear(); colors.clear(); }
 	}
 
 	/** This method is called by Swing to replace text in this document. */
@@ -186,20 +210,26 @@ class OurSyntaxDocument extends DefaultStyledDocument {
 		String content = toString();
 		int lineCount = do_getLineCount();
 		while(line>0 && (line>=comments.size() || comments.get(line)<0)) line--; // "-1" in comments array are always contiguous
-		int comment = do_reapply(line==0 ? 0 : comments.get(line), content, line);
+		while(line>0 && (line>=colors.size() || colors.get(line)<0)) line--; // "-1" in comments array are always contiguous
+		int x = do_reapply(line==0 ? 0 : comments.get(line), line==0 ? 0 : colors.get(line), content, line);
+		int color = x % 10;
+		int comment = x / 10;
 		for (line++; line < lineCount; line++) { // update each subsequent line until it already starts with its expected comment mode
-			if (line < comments.size() && comments.get(line) == comment) break; else comment = do_reapply(comment, content, line);
+			if (line < comments.size() && comments.get(line) == comment && colors.get(line) == color) break; else { int n = do_reapply(comment, color, content, line); comment = n / 10; color = n % 10;}
 		}
 	}
 
 	/** Re-color the given line assuming it starts with a given comment mode, then return the comment mode for start of next line. */
-	private final int do_reapply(int comment, final String txt, final int line) {
+	private final int do_reapply(int comment, int color, final String txt, final int line) {
 		while (line >= comments.size()) comments.add(-1); // enlarge array if needed
+		while (line >= colors.size()) colors.add(-1); // enlarge array if needed
 		comments.set(line, comment);                      // record the fact that this line starts with the given comment mode
+		colors.set(line, color);                      // record the fact that this line starts with the given comment mode
 		for(int n = txt.length(), i = do_getLineStartOffset(line); i < n;) {
 			final int oldi = i;
 			final char c = txt.charAt(i);
 			if (c=='\n') break;
+
 			if (comment==0 && c=='/' && i<n-3 && txt.charAt(i+1)=='*' && txt.charAt(i+2)=='*' && txt.charAt(i+3)!='/') comment = 2;
 			if (comment==0 && c=='/' && i==n-3 && txt.charAt(i+1)=='*' && txt.charAt(i+2)=='*') comment = 2;
 			if (comment==0 && c=='/' && i<n-1 && txt.charAt(i+1)=='*') { comment = 1; i = i + 2; }
@@ -218,25 +248,36 @@ class OurSyntaxDocument extends DefaultStyledDocument {
 					if (txt.charAt(i)=='\"') {i++; break;}
 					if (txt.charAt(i)=='\\' && i+1<n && txt.charAt(i+1)!='\n') i++;
 				}
-				setCharacterAttributes(oldi, i-oldi, styleString, false);
-			} else if (do_iden(c)) {
+				setCharacterAttributes(oldi, i-oldi, styleString(color), false);
+			} else if (do_color2(c) || do_color(c)) {
+				if (color == 0 && do_color(c)) {color = c-'①'+1;}
+				else if (color == 0 && do_color2(c)) {color = -(c-'❶'+1);}
+				else if (color != 0) {color = 0;}
+				i++;
+				if (c == '①' || c == '❶') 	setCharacterAttributes(oldi, i-oldi, styleC1, false);
+				if (c == '②' || c == '❷') 	setCharacterAttributes(oldi, i-oldi, styleC2, false);
+				if (c == '③' || c == '❸') 	setCharacterAttributes(oldi, i-oldi, styleC3, false);
+				if (c == '④' || c == '❹') 	setCharacterAttributes(oldi, i-oldi, styleC4, false);
+			}
+			else if(do_iden(c)) {
 				for(i++; i<n && do_iden(txt.charAt(i)); i++) { }
-				AttributeSet style = (c>='0' && c<='9') ? styleNumber : (do_keyword(txt, oldi, i-oldi) ? styleKeyword : styleNormal);
+				AttributeSet style = (c>='0' && c<='9') ? styleNumber(color) : (do_keyword(txt, oldi, i-oldi) ? styleKeyword(color) : styleNormal(color));
 				setCharacterAttributes(oldi, i-oldi, style, false);
 			} else {
-				for(i++; i<n && !do_iden(txt.charAt(i)) && txt.charAt(i)!='\n' && txt.charAt(i)!='-' && txt.charAt(i)!='/'; i++) { }
-				setCharacterAttributes(oldi, i-oldi, styleSymbol, false);
+				for(i++; i<n && !do_iden(txt.charAt(i)) && txt.charAt(i)!='\n' && txt.charAt(i)!='-' && txt.charAt(i)!='/' && !do_color(txt.charAt(i)) && !do_color2(txt.charAt(i)); i++) { }
+				setCharacterAttributes(oldi, i-oldi, styleSymbol(color), false);
 			}
 		}
-		return comment;
+		return comment*10+color;
 	}
 
 	/** Reapply the appropriate style to the entire document. */
 	private final void do_reapplyAll() {
 		setCharacterAttributes(0, getLength(), styleNormal, true);
 		comments.clear();
+		colors.clear();
 		String content = toString();
-		for(int comment = 0, i = 0, n = do_getLineCount(); i < n; i++)  comment = do_reapply(comment, content, i);
+		for(int comment = 0, color = 0, i = 0, n = do_getLineCount(); i < n; i++)  { int x = do_reapply(comment, color, content, i) / 10; color = x % 10; comment = x / 10; }
 	}
 
 	/** Changes the font and tabsize for the document. */

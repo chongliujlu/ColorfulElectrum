@@ -18,6 +18,8 @@ package edu.mit.csail.sdg.alloy4;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Shape;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
@@ -38,8 +40,13 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.AbstractDocument;
 import javax.swing.text.BoxView;
+import javax.swing.text.ComponentView;
 import javax.swing.text.Document;
 import javax.swing.text.Element;
+import javax.swing.text.IconView;
+import javax.swing.text.LabelView;
+import javax.swing.text.ParagraphView;
+import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledEditorKit;
 import javax.swing.text.View;
 import javax.swing.text.ViewFactory;
@@ -102,13 +109,34 @@ public final class OurSyntaxWidget {
          @Override public Document createDefaultDocument() { return doc; }
          @Override public ViewFactory getViewFactory() {
             return new ViewFactory() {
-               public View create(Element x) {
-                  if (!AbstractDocument.SectionElementName.equals(x.getName())) return defaultFactory.create(x);
-                  return new BoxView(x, View.Y_AXIS) { // 30000 is a good width to use here; value > 32767 appears to cause errors
-                     @Override public final float getMinimumSpan(int axis) { return super.getPreferredSpan(axis); }
-                     @Override public final void layout(int w, int h) { try {super.layout(30000, h);} catch(Throwable ex) {} }
-                  };
-               }
+            	public View create(Element elem) { 
+                    String kind = elem.getName(); 
+                    if (kind != null) { 
+                        if (kind.equals(AbstractDocument.ContentElementName)) { 
+
+                            return new MyLabelView(elem); 
+                        } 
+                        else if (kind.equals(AbstractDocument.ParagraphElementName)) { 
+                            return new ParagraphView(elem); 
+                        } 
+                        else if (kind.equals(AbstractDocument.SectionElementName)) { 
+                        	return new BoxView(elem, View.Y_AXIS) { // 30000 is a good width to use here; value > 32767 appears to cause errors
+                              @Override public final float getMinimumSpan(int axis) { return super.getPreferredSpan(axis); }
+                              @Override public final void layout(int w, int h) { try {super.layout(30000, h);} catch(Throwable ex) {} }
+                           };
+                        } 
+                        else if (kind.equals(StyleConstants.ComponentElementName)) { 
+                            return new ComponentView(elem); 
+                        } 
+                        else if (kind.equals(StyleConstants.IconElementName)) { 
+                            return new IconView(elem); 
+                        } 
+
+                    } 
+             
+                    // default to text display 
+                    return new LabelView(elem); 
+                } 
             };
          }
       });
@@ -309,4 +337,35 @@ public final class OurSyntaxWidget {
 	   int x2 = pane.getSelectionEnd()-getLineStartOffset(y2-1);
 	   return new Pos(getFilename(), x1, y1, x2, y2);
    }
+
+   class MyLabelView extends LabelView { 
+
+	   
+	    public MyLabelView(Element elem) { 
+	        super(elem); 
+	    } 
+	 
+	    public void paint(Graphics g, Shape allocation) { 
+	        super.paint(g, allocation); 
+	        paintStrikeLine(g, allocation); 
+
+	    } 
+	 
+	    public void paintStrikeLine(Graphics g, Shape a) { 
+	        Color c=(Color)getElement().getAttributes().getAttribute("strike-color"); 
+	        if (c!=null) { 	
+	            int y = a.getBounds().y + a.getBounds().height - (int) getGlyphPainter().getDescent(this); 
+
+	            y = y - (int) (getGlyphPainter().getAscent(this) * 0.3f); 
+	            int x1 = (int) a.getBounds().getX(); 
+	            int x2 = (int) (a.getBounds().getX() + a.getBounds().getWidth()); 
+
+	 
+	            Color old = g.getColor(); 
+	            g.setColor(c); 
+	            g.drawLine(x1, y, x2, y); 
+	            g.setColor(old); 
+	        } 
+	    } 
 }
+   }
