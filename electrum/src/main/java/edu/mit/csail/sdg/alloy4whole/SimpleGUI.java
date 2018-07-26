@@ -1102,30 +1102,6 @@ public final class SimpleGUI implements ComponentListener, Listener {
         return null;
     }
         
-    private Runner paintYesBlue() {
-        if (wrap) return wrapMe();
-        text.paint(new Color(140, 180, 255), false);
-    	return null;
-    }
-
-    private Runner paintYesRed() {
-        if (wrap) return wrapMe();
-        text.paint(new Color(255, 140, 160), false);
-    	return null;
-    }
-    
-    private Runner paintFalseBlue() {
-        if (wrap) return wrapMe();
-        text.paint(new Color(140, 180, 255), true);
-    	return null;
-    }
-
-    private Runner paintFalseRed() {
-        if (wrap) return wrapMe();
-        text.paint(new Color(255, 140, 160), true);
-    	return null;
-    }
-
     //===============================================================================================================//
 
     /** This method refreshes the "Window" menu for either the SimpleGUI window (isViz==false) or the VizGUI window (isViz==true). */
@@ -1742,10 +1718,6 @@ public final class SimpleGUI implements ComponentListener, Listener {
             toolbar.add(stopbutton=OurUtil.button("Stop", "Stops the current analysis", "images/24_execute_abort2.gif", doStop(2)));
             stopbutton.setVisible(false);
             toolbar.add(showbutton=OurUtil.button("Show", "Shows the latest instance", "images/24_graph.gif", doShowLatest()));
-            toolbar.add(OurUtil.button("RED", "Paint Red", "images/red.gif", paintYesRed()));
-            toolbar.add(OurUtil.button("BLUE", "Paint Blue", "images/blue.gif", paintYesBlue()));
-            toolbar.add(OurUtil.button("!RED", "Paint !Red", "images/red.gif", paintFalseRed()));
-            toolbar.add(OurUtil.button("!BLUE", "Paint !Blue", "images/blue.gif", paintFalseBlue()));
             toolbar.add(Box.createHorizontalGlue());
             toolbar.setBorder(new OurBorder(false,false,false,false));
         } finally {
