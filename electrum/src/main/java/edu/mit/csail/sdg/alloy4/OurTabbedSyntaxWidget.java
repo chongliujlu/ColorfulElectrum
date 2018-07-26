@@ -298,27 +298,7 @@ public final class OurTabbedSyntaxWidget {
    /** Highlights the text editor, based on the location information in the Pos object. */
    public void shade(Pos pos) { 
 	   shade(Util.asList(pos), new Color(0.9f, 0.4f, 0.4f), false, true); 
-	   for (Color c : colors_pos.keySet())
-		   shade(colors_pos.get(c), c, false, false);
-	   for (Color c : colors_neg.keySet())
-		   shade(colors_neg.get(c), c, true, false);
    }
    
-   private Map<Color,List<Pos>> colors_pos = new LinkedHashMap<Color,List<Pos>>();
-   private Map<Color,List<Pos>> colors_neg = new LinkedHashMap<Color,List<Pos>>();
 
-   public void paint (Color color, boolean strike) {
-	   Map<Color,List<Pos>> colors = strike?colors_neg:colors_pos;
-	   colors.get(color);
-	   if (colors.get(color) == null)
-		   colors.put(color, new ArrayList<Pos>());
-	   Pos pos = get().getPosSelected();
-	   colors.get(color).add(pos);
-	   for (Color c : colors_pos.keySet())
-		   shade(colors_pos.get(c), c, false, false);
-	   for (Color c : colors_neg.keySet())
-		   shade(colors_neg.get(c), c, true, false);
-   }
-   
-   
 }
