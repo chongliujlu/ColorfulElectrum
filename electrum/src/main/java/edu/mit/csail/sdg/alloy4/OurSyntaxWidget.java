@@ -39,6 +39,7 @@ import javax.swing.event.CaretListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.AbstractDocument;
+import javax.swing.text.BadLocationException;
 import javax.swing.text.BoxView;
 import javax.swing.text.ComponentView;
 import javax.swing.text.Document;
@@ -142,6 +143,32 @@ public final class OurSyntaxWidget {
       });
       if (text.length()>0) { pane.setText(text); pane.setCaretPosition(0); }
       doc.do_clearUndo();
+      for (int i = 0; i < 6; i ++) {
+    	  final int k = i; 
+	      pane.getActionMap().put("alloy_c"+(i+1), new AbstractAction("alloy_c"+(i+1)) {
+	          public void actionPerformed(ActionEvent e) { try {
+				pane.getDocument().insertString(pane.getSelectionStart(), ""+((char) (OurSyntaxDocument.O1+k)), null);
+				pane.getDocument().insertString(pane.getSelectionEnd(), ""+((char) (OurSyntaxDocument.O1+k)), null);
+				if (pane.getSelectionStart()==pane.getSelectionEnd())
+					pane.setSelectionStart(pane.getSelectionStart()-1);
+				pane.setSelectionEnd(pane.getSelectionEnd()-1);
+			} catch (BadLocationException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} } 
+	       });
+	      pane.getActionMap().put("alloy_s"+(i+1), new AbstractAction("alloy_s"+(i+1)) {
+	          public void actionPerformed(ActionEvent e) { try {
+				pane.getDocument().insertString(pane.getSelectionStart(), ""+((char) (OurSyntaxDocument.E1+k)), null);
+				pane.getDocument().insertString(pane.getSelectionEnd(), ""+((char) (OurSyntaxDocument.E1+k)), null);
+				if (pane.getSelectionStart()==pane.getSelectionEnd())
+					pane.setSelectionStart(pane.getSelectionStart()-1);
+				pane.setSelectionEnd(pane.getSelectionEnd()-1);
+			} catch (BadLocationException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} } 
+	       });      }
       pane.getActionMap().put("alloy_copy", new AbstractAction("alloy_copy") {
          public void actionPerformed(ActionEvent e) { pane.copy(); }
       });
@@ -157,6 +184,18 @@ public final class OurSyntaxWidget {
       pane.getActionMap().put("alloy_ctrl_pagedown", new AbstractAction("alloy_ctrl_pagedown") {
          public void actionPerformed(ActionEvent e) { listeners.fire(me, Event.CTRL_PAGE_DOWN); }
       });
+      pane.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_1, InputEvent.CTRL_MASK), "alloy_c1");
+      pane.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_2, InputEvent.CTRL_MASK), "alloy_c2");
+      pane.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_3, InputEvent.CTRL_MASK), "alloy_c3");
+      pane.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_4, InputEvent.CTRL_MASK), "alloy_c4");
+      pane.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_5, InputEvent.CTRL_MASK), "alloy_c5");
+      pane.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_6, InputEvent.CTRL_MASK), "alloy_c6");
+      pane.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_1, InputEvent.CTRL_MASK | InputEvent.SHIFT_MASK), "alloy_s1");
+      pane.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_2, InputEvent.CTRL_MASK | InputEvent.SHIFT_MASK), "alloy_s2");
+      pane.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_3, InputEvent.CTRL_MASK | InputEvent.SHIFT_MASK), "alloy_s3");
+      pane.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_4, InputEvent.CTRL_MASK | InputEvent.SHIFT_MASK), "alloy_s4");
+      pane.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_5, InputEvent.CTRL_MASK | InputEvent.SHIFT_MASK), "alloy_s5");
+      pane.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_6, InputEvent.CTRL_MASK | InputEvent.SHIFT_MASK), "alloy_s6");
       pane.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_MASK), "alloy_copy");
       pane.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.CTRL_MASK), "alloy_cut");
       pane.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.CTRL_MASK), "alloy_paste");
@@ -346,9 +385,9 @@ public final class OurSyntaxWidget {
 	    } 
 	 
 	    public void paint(Graphics g, Shape allocation) { 
-	        super.paint(g, allocation); 
+	        super.removeAll();
+	    	super.paint(g, allocation); 
 	        paintStrikeLine(g, allocation); 
-
 	    } 
 	 
 	    public void paintStrikeLine(Graphics g, Shape a) { 
@@ -356,14 +395,13 @@ public final class OurSyntaxWidget {
 	        if (c!=null) { 	
 	            int y = a.getBounds().y + a.getBounds().height - (int) getGlyphPainter().getDescent(this); 
 
-	            y = y - (int) (getGlyphPainter().getAscent(this) * 0.3f); 
+	            y = y - (int) (getGlyphPainter().getAscent(this) * 0.5f); 
 	            int x1 = (int) a.getBounds().getX(); 
 	            int x2 = (int) (a.getBounds().getX() + a.getBounds().getWidth()); 
-
 	 
 	            Color old = g.getColor(); 
 	            g.setColor(c); 
-	            g.drawLine(x1, y, x2, y); 
+	            g.drawRect(x1, y, x2-x1, 1); 
 	            g.setColor(old); 
 	        } 
 	    } 

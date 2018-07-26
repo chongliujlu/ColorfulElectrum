@@ -31,6 +31,7 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 import javax.swing.AbstractAction;
 import javax.swing.JPanel;
@@ -104,28 +105,39 @@ public final class OurConsole extends JScrollPane {
       StyleConstants.setBold(s, boldness);
       StyleConstants.setForeground(s, color);
       StyleConstants.setLeftIndent(s, leftIndent);
+      s.removeAttribute("strike-color");
       return s;
    }
 
-   static MutableAttributeSet style(String fontName, int fontSize, boolean boldness, Color color, int leftIndent, int n) {
+   static MutableAttributeSet style(String fontName, int fontSize, boolean boldness, Color color, Set<Color> pos, Set<Color> neg, int leftIndent) {
 	      MutableAttributeSet s = new SimpleAttributeSet();
 	      StyleConstants.setFontFamily(s, fontName);
 	      StyleConstants.setFontSize(s, fontSize);
 	      StyleConstants.setBold(s, boldness);
 	      StyleConstants.setForeground(s, color);
 	      StyleConstants.setLeftIndent(s, leftIndent);
-	      if (n > 0) {
-	    	  if (n == 1) StyleConstants.setBackground(s, new Color(240,195,195));
-	    	  else if (n == 2) StyleConstants.setBackground(s, new Color(206,215,242));
-	    	  else if (n == 3) StyleConstants.setBackground(s, new Color(204, 255, 153));
-	    	  else if (n == 4) StyleConstants.setBackground(s, new Color(249,226,253));
-	      } else if (n < 0) {
-	    	  if (n == -1) s.addAttribute("strike-color", new Color(240,195,195));
-	    	  else if (n == -2) s.addAttribute("strike-color", new Color(206,215,242));
-	    	  else if (n == -3) s.addAttribute("strike-color", new Color(204, 255, 153));
-	    	  else if (n == -4) s.addAttribute("strike-color", new Color(249,226,253));
+	      int r = 0, g = 0, b = 0;
+	      Color bg = new Color(255,255,255);
+	      if (!pos.isEmpty()) {
+	    	  for (Color c : pos) {
+	    		  r+=c.getRed(); g+=c.getGreen(); b+=c.getBlue();
+	    	  }
+	    	  int n = pos.size();
+	    	  bg = new Color(Math.min(r/n, 255),Math.min(g/n, 255),Math.min(b/n, 255));
 	      }
-	      else StyleConstants.setBackground(s, new Color(255,255,255));
+    	  StyleConstants.setBackground(s, bg);
+
+    	  if (!neg.isEmpty()) {
+    	      r = 0; g = 0; b = 0;
+	    	  for (Color c : neg) {
+	    		  r+=c.getRed(); g+=c.getGreen(); b+=c.getBlue();
+	    	  }
+	    	  int n = neg.size();
+	    	  bg = new Color(Math.min(r/n, 255),Math.min(g/n, 255),Math.min(b/n, 255));
+	    	  s.addAttribute("strike-color", bg);
+    	  } else {
+	    	  s.removeAttribute("strike-color");
+    	  }
 	      return s;
    }
    
