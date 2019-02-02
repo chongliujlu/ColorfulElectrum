@@ -46,6 +46,9 @@ import edu.mit.csail.sdg.alloy4compiler.ast.Sig.PrimSig;
 
 public abstract class Expr extends Browsable {
 
+   public int color;
+   public Expr paint(int c) {color=c;return this;}
+	
    /** The filename, line, and column position in the original Alloy model file (cannot be null). */
    public final Pos pos;
 
