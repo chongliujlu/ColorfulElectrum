@@ -62,7 +62,7 @@ public final class ExprBinary extends Expr {
    //============================================================================================================//
 
    /** Constructs a new ExprBinary node. */
-   private ExprBinary(Pos pos, Pos closingBracket, Op op, Expr left, Expr right, Type type, JoinableList<Err> errors) {
+   private ExprBinary(Pos pos, Pos closingBracket, Op op, Expr left, Expr right, Type type, JoinableList<Err> errors, int color) {
       super(pos,
             closingBracket,
             left.ambiguous || right.ambiguous,
@@ -73,6 +73,7 @@ public final class ExprBinary extends Expr {
       this.op = op;
       this.left = left;
       this.right = right;
+      this.color = color;
    }
 
    //============================================================================================================//
@@ -216,12 +217,14 @@ public final class ExprBinary extends Expr {
        */
       public final boolean isArrow;
 
+      public final Expr make(Pos pos, Pos closingBracket, Expr left, Expr right) { return make(pos,closingBracket,left,right,0); }
+
       /** Constructs a new ExprBinary node.
        * @param pos - the original position in the source file (can be null if unknown)
        * @param left - the left hand side expression
        * @param right - the right hand side expression
        */
-      public final Expr make(Pos pos, Pos closingBracket, Expr left, Expr right) {
+      public final Expr make(Pos pos, Pos closingBracket, Expr left, Expr right, int color) {
          switch(this) {
            case AND: return ExprList.makeAND(pos, closingBracket, left, right);
            case OR: return ExprList.makeOR(pos, closingBracket, left, right);
@@ -325,7 +328,7 @@ public final class ExprBinary extends Expr {
             errs = errs.make(new ErrorSyntax(left.span(), "Multiplicity expression not allowed here."));
          if ((isArrow && right.mult==1) || (!isArrow && this!=Op.IN && right.mult!=0))
             errs = errs.make(new ErrorSyntax(right.span(), "Multiplicity expression not allowed here."));
-         return new ExprBinary(pos, closingBracket, this, left, right, type, errs.make(e));
+         return new ExprBinary(pos, closingBracket, this, left, right, type, errs.make(e), color);
       }
 
       /** Returns the human readable label for this operator. */
@@ -506,7 +509,7 @@ public final class ExprBinary extends Expr {
       Expr left = this.left.resolve(a, warns);
       Expr right = this.right.resolve(b, warns);
       if (w!=null) warns.add(w);
-      return (left==this.left && right==this.right) ? this : op.make(pos, closingBracket, left, right);
+      return (left==this.left && right==this.right) ? this : op.make(pos, closingBracket, left, right, color);
    }
 
    //============================================================================================================//

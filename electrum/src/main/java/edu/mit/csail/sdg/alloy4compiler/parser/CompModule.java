@@ -436,7 +436,7 @@ public final class CompModule extends Browsable implements Module {
 
 		/** {@inheritDoc} */
 		@Override public Expr visit(ExprUnary x) throws Err {
-			return x.op.make(x.pos, visitThis(x.sub));
+			return x.op.make(x.pos, visitThis(x.sub), x.color);
 		}
 
 		/** {@inheritDoc} */

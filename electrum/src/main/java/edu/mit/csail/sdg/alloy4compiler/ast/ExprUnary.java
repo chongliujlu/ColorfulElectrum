@@ -90,10 +90,11 @@ public final class ExprUnary extends Expr {
     //============================================================================================================//
 
     /** Constructs an unary expression. */
-    private ExprUnary(Pos pos, Op op, Expr sub, Type type, long weight, JoinableList<Err> errors) {
+    private ExprUnary(Pos pos, Op op, Expr sub, Type type, long weight, JoinableList<Err> errors, int color) {
         super(pos, null, sub.ambiguous, type, (op==Op.EXACTLYOF||op==Op.SOMEOF||op==Op.LONEOF||op==Op.ONEOF||op==Op.SETOF)?1:0, weight, errors);
         this.op = op;
         this.sub = sub;
+        this.color = color;
     }
 
     //============================================================================================================//
@@ -154,6 +155,10 @@ public final class ExprUnary extends Expr {
          */
         public final Expr make(Pos pos, Expr sub) { return make(pos, sub, null, 0); }
 
+        public final Expr make(Pos pos, Expr sub, int c) { return make(pos, sub, null, 0, c); }
+
+        public final Expr make(Pos pos, Expr sub, Err extraError, long extraWeight) { return make(pos,sub,extraError,extraWeight,0); }
+
         /** Construct an ExprUnary node.
          * @param pos - the original position of the "unary operator" in the file (can be null if unknown)
          * @param sub - the subexpression
@@ -165,7 +170,7 @@ public final class ExprUnary extends Expr {
          * <br> Alloy4 does allow "variable : set (X lone-> Y)", where we ignore the word "set".
          * <br> (This desugaring is done by the ExprUnary.Op.make() method, so ExprUnary's constructor never sees it)
          */
-        public final Expr make(Pos pos, Expr sub, Err extraError, long extraWeight) {
+        public final Expr make(Pos pos, Expr sub, Err extraError, long extraWeight, int color) {
             if (pos==null || pos==Pos.UNKNOWN) { if (this==NOOP) pos = sub.pos; else pos = sub.span(); }
             JoinableList<Err> errors = sub.errors.make(extraError);
             if (sub.mult!=0) {
@@ -234,7 +239,7 @@ public final class ExprUnary extends Expr {
                 type=SIGINT.type;
                 break;
             }
-            return new ExprUnary(pos, this, sub, type, extraWeight + sub.weight, errors.make(extraError));
+            return new ExprUnary(pos, this, sub, type, extraWeight + sub.weight, errors.make(extraError), color);
         }
 
         /** Returns the human readable label for this operator */
@@ -284,7 +289,7 @@ public final class ExprUnary extends Expr {
         Expr sub = this.sub.resolve(s, warns);
         if (w1!=null) warns.add(w1);
         if (w2!=null) warns.add(w2);
-        return (sub==this.sub) ? this : op.make(pos, sub, null, weight-(this.sub.weight));
+        return (sub==this.sub) ? this : op.make(pos, sub, null, weight-(this.sub.weight), color);
     }
 
     //============================================================================================================//
