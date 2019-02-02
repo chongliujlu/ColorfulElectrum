@@ -213,14 +213,14 @@ import java_cup.runtime.*;
 "this"                { return alloy_sym(yytext(), CompSym.THIS        );}
 "univ"                { return alloy_sym(yytext(), CompSym.UNIV        );}
 "Time"                { return alloy_sym(yytext(), CompSym.TIME        );} // [HASLab] time scopes currently managed at the options
-"①"                	  { } // [HASLab] colors
-"❶"                	  { } // [HASLab] colors
-"②"                	  { } // [HASLab] colors
-"❷"                	  { } // [HASLab] colors
-"③"                	  { } // [HASLab] colors
-"❸"                	  { } // [HASLab] colors
-"④"                	  { } // [HASLab] colors
-"❹"                	  { } // [HASLab] colors
+"①"                	  { return alloy_sym(yytext(), CompSym.FEAT1       );} // [HASLab] colors
+"❶"                	  { return alloy_sym(yytext(), CompSym.FEAT1       );} // [HASLab] colors
+"②"                	  { return alloy_sym(yytext(), CompSym.FEAT2       );} // [HASLab] colors
+"❷"                	  { return alloy_sym(yytext(), CompSym.FEAT2       );} // [HASLab] colors
+"③"                	  { return alloy_sym(yytext(), CompSym.FEAT3       );} // [HASLab] colors
+"❸"                	  { return alloy_sym(yytext(), CompSym.FEAT3       );} // [HASLab] colors
+"④"                	  { return alloy_sym(yytext(), CompSym.FEAT4       );} // [HASLab] colors
+"❹"                	  { return alloy_sym(yytext(), CompSym.FEAT4       );} // [HASLab] colors
 
 [\"] ([^\\\"] | ("\\" .))* [\"] [\$0-9a-zA-Z_\"] [\$0-9a-zA-Z_\"]* { throw new ErrorSyntax(alloy_here(yytext()),"String literal cannot be followed by a legal identifier character."); }  // [HASLab]
 [\"] ([^\\\"] | ("\\" .))* [\"]                                        { return alloy_string(yytext()); }

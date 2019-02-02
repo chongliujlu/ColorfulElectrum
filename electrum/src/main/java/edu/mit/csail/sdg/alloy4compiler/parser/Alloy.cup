@@ -175,6 +175,10 @@ parser code {:
     ch.put(CompSym.LONE2, "lone");
     ch.put(CompSym.LONE, "lone");
     ch.put(CompSym.LPAREN, "(");
+    ch.put(CompSym.FEAT1, "①");
+    ch.put(CompSym.FEAT2, "②");
+    ch.put(CompSym.FEAT3, "③");
+    ch.put(CompSym.FEAT4, "④");
     ch.put(CompSym.LT, "<");
     ch.put(CompSym.LTE, "<=");
     ch.put(CompSym.MINUS, "-");
@@ -456,6 +460,10 @@ terminal Pos LET;              //  let
 terminal Pos LONE2;            //  lone      // The filter enables us to disambiguate
 terminal Pos LONE;             //  lone      // The filter enables us to disambiguate
 terminal Pos LPAREN;           //  (
+terminal Pos FEAT1;           //  (
+terminal Pos FEAT2;           //  (
+terminal Pos FEAT3;           //  (
+terminal Pos FEAT4;           //  (
 terminal Pos LT;               //  <
 terminal Pos LTE;              //  <=     =<
 terminal Pos MINUS;            //  -
@@ -1141,6 +1149,10 @@ BaseExpr ::= INTMIN:o                               {: RESULT = ExprConstant.Op.
 BaseExpr ::= INTMAX:o                               {: RESULT = ExprConstant.Op.MAX.make(o, 0);                           :};
 BaseExpr ::= INTNEXT:o                              {: RESULT = ExprConstant.Op.NEXT.make(o, 0);                          :};
 BaseExpr ::= LPAREN Expr:x RPAREN                   {: RESULT = x;                                                        :};
+BaseExpr ::= FEAT1 Expr:x FEAT1                     {: RESULT = x.paint(1);                                                        :};
+BaseExpr ::= FEAT2 Expr:x FEAT2                     {: RESULT = x.paint(2);                                                        :};
+BaseExpr ::= FEAT3 Expr:x FEAT3                     {: RESULT = x.paint(3);                                                        :};
+BaseExpr ::= FEAT4 Expr:x FEAT4                     {: RESULT = x.paint(4);                                                        :};
 BaseExpr ::= SigRef:x                               {: RESULT = x;                                                        :};
 BaseExpr ::= AT:o Name:x                            {: nod(x); RESULT = ExprVar.make(o.merge(x.pos), "@"+x.label);        :};
 BaseExpr ::= Super:x                                {: RESULT = x;                                                        :};
