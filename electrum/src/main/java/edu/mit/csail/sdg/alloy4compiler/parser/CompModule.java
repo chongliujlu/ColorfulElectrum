@@ -429,6 +429,7 @@ public final class CompModule extends Browsable implements Module {
 		/** {@inheritDoc} */
 		@Override public Expr visit(ExprVar x) throws Err {
 			Expr obj = resolve(x.pos, x.label);
+			obj.paint(x.color); //[HASLab] colorful electrum
 			Expr res;
 			if (obj instanceof Macro) res = ((Macro)obj).instantiate(this, warns); else res = obj;
 			return res;
@@ -1007,7 +1008,7 @@ public final class CompModule extends Browsable implements Module {
 				if (parentAST==null) throw new ErrorSyntax(n.pos, "The sig \""+n.label+"\" cannot be found.");
 				parents.add(resolveSig(res, topo, parentAST, warns)); // [HASLab]
 			}
-			realSig = new SubsetSig(fullname, parents, oldS.attributes.toArray(new Attr[0]));
+			realSig = new SubsetSig(fullname, parents, oldS.color, oldS.attributes.toArray(new Attr[0]));
 			for (Sig n : parents)
 				if (n.isVariable!=null && realSig.isVariable==null) // [HASLab]
 					warns.add(new ErrorWarning(realSig.isSubset, "Static sub-sig in variable sig.\n"
@@ -1020,7 +1021,7 @@ public final class CompModule extends Browsable implements Module {
 			if (!(parent instanceof PrimSig)) throw new ErrorSyntax(sup.pos, "Cannot extend the subset signature \"" + parent
 					+ "\".\n" + "A signature can only extend a toplevel signature or a subsignature.");
 			PrimSig p = (PrimSig)parent;
-			realSig = new PrimSig(fullname, p, oldS.attributes.toArray(new Attr[0]));
+			realSig = new PrimSig(fullname, p, oldS.color, oldS.attributes.toArray(new Attr[0]));
 			if (parent.isVariable!=null && realSig.isVariable==null) // [HASLab]
 				warns.add(new ErrorWarning(realSig.isSubsig, "Static sig extends variable sig.\n"
 						+ "Sig "+realSig.label+" is static but "+parent.label+" is variable."));

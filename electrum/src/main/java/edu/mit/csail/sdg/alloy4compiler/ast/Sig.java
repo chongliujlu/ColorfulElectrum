@@ -185,10 +185,15 @@ public abstract class Sig extends Expr {
 		this.attributes = ConstList.make();
 	}
 
+	private Sig(Type type, String label, Attr... attributes) throws Err {
+		this(type,label,0,attributes);
+	}
+
 	/** Constructs a new PrimSig or SubsetSig. */
 	// [HASLab] extended with variable attribute
-	private Sig(Type type, String label, Attr... attributes) throws Err {
+	private Sig(Type type, String label, int color, Attr... attributes) throws Err {
 		super(AttrType.WHERE.find(attributes), type);
+		this.color = color;
 		this.attributes = Util.asList(attributes);
 		Expr oneof = ExprUnary.Op.ONEOF.make(null, this);
 		ExprVar v = ExprVar.make(null, "this", oneof.type);
@@ -320,6 +325,10 @@ public abstract class Sig extends Expr {
 			if (add) this.parent.children.add(this);
 		}
 
+		public PrimSig (String label, PrimSig parent, Attr... attributes) throws Err {
+			this(label,parent,0,attributes);
+		}
+
 		/** Constructs a non-builtin sig.
 		 * 
 		 * @param label - the name of this sig (it does not need to be unique)
@@ -329,8 +338,8 @@ public abstract class Sig extends Expr {
 		 * @throws ErrorSyntax if the signature has two or more multiplicities
 		 * @throws ErrorType if you attempt to extend the builtin sigs NONE, SIGINT, SEQIDX, or STRING
 		 */
-		public PrimSig (String label, PrimSig parent, Attr... attributes) throws Err {
-			super(((parent!=null && parent.isEnum!=null) ? parent.type : null), label, Util.append(attributes, Attr.SUBSIG));
+		public PrimSig (String label, PrimSig parent, int color, Attr... attributes) throws Err {
+			super(((parent!=null && parent.isEnum!=null) ? parent.type : null), label,  color, Util.append(attributes, Attr.SUBSIG));
 			if (parent==SIGINT) throw new ErrorSyntax(pos, "sig "+label+" cannot extend the builtin \"Int\" signature");
 			if (parent==SEQIDX) throw new ErrorSyntax(pos, "sig "+label+" cannot extend the builtin \"seq/Int\" signature");
 			if (parent==STRING) throw new ErrorSyntax(pos, "sig "+label+" cannot extend the builtin \"String\" signature");
@@ -423,7 +432,11 @@ public abstract class Sig extends Expr {
 		 * @throws ErrorType if parents only contains NONE
 		 */
 		public SubsetSig(String label, Collection<Sig> parents, Attr... attributes) throws Err {
-			super(getType(label,parents), label, Util.append(attributes, Attr.SUBSET));
+			this(label,parents,0,attributes);
+		}
+
+		public SubsetSig(String label, Collection<Sig> parents, int color, Attr... attributes) throws Err {
+			super(getType(label,parents), label, color, Util.append(attributes, Attr.SUBSET));
 			if (isEnum!=null) throw new ErrorType(pos, "Subset signature cannot be an enum.");
 			boolean exact = false;
 			for(Attr a: attributes) if (a!=null && a.type==AttrType.EXACT) exact = true;
