@@ -279,7 +279,7 @@ public final class OurTabbedSyntaxWidget {
    }
 
    /** Highlights the text editor, based on the location information in the set of Pos objects. */
-   public void shade(Iterable<Pos> set, Color color, boolean strike, boolean clearOldHighlightsFirst) {
+   public void shade(Iterable<Pos> set, Color color, boolean clearOldHighlightsFirst) {
       if (clearOldHighlightsFirst) clearShade();
       OurSyntaxWidget text = null;
       int c = 0, d;
@@ -287,7 +287,6 @@ public final class OurTabbedSyntaxWidget {
          text = get();
          c = text.getLineStartOffset(p.y-1) + p.x - 1;
          d = text.getLineStartOffset(p.y2-1) + p.x2 - 1;
-         text.shade(color, strike, c, d+1);
       }
       if (text!=null) { text.moveCaret(0, 0); text.moveCaret(c, c); } // Move to 0 ensures we'll scroll to the highlighted section
       get().requestFocusInWindow();
@@ -297,7 +296,7 @@ public final class OurTabbedSyntaxWidget {
 
    /** Highlights the text editor, based on the location information in the Pos object. */
    public void shade(Pos pos) { 
-	   shade(Util.asList(pos), new Color(0.9f, 0.4f, 0.4f), false, true); 
+	   shade(Util.asList(pos), new Color(0.9f, 0.4f, 0.4f), true); 
    }
    
 

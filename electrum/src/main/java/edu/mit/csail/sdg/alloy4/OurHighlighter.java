@@ -16,12 +16,9 @@
 package edu.mit.csail.sdg.alloy4;
 
 import java.awt.Color;
-import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.Shape;
-import java.awt.font.TextAttribute;
-import java.util.Map;
 
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Highlighter;
@@ -35,10 +32,14 @@ import javax.swing.text.JTextComponent;
 public final class OurHighlighter implements Highlighter.HighlightPainter {
 
    /** The color to use when drawing highlights. */
-   public final boolean strike;
    public final Color color;
 
-   /** Construct a highlighter with the given color. */
+   /** Whether to strike out rather than highlight. */
+   // [HASLab] colorful electrum
+   public final boolean strike;
+   
+   /** Construct a highlighter with the given color and whether to strike out. */
+   // [HASLab] colorful electrum
    public OurHighlighter(Color color, boolean strike) { this.color = color; this.strike = strike; }
 
    /** This method is called by Swing to draw highlights. */
@@ -50,6 +51,8 @@ public final class OurHighlighter implements Highlighter.HighlightPainter {
          if (a.y == b.y) {
             // same line (Note: furthermore, if start==end, then we draw all the way to the right edge)
             Rectangle r = a.union(b);
+            // [HASLab] colorful electrum
+            // if strike, strike out rather than highlight
             if (!strike)
             	gr.fillRect(r.x, r.y, (r.width<=1 ? (box.x + box.width - r.x) : r.width), r.height);
             else

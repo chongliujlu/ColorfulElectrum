@@ -110,12 +110,11 @@ public final class OurSyntaxWidget {
          @Override public Document createDefaultDocument() { return doc; }
          @Override public ViewFactory getViewFactory() {
             return new ViewFactory() {
-            	public View create(Element elem) { 
+            	public View create(Element elem) {  
                     String kind = elem.getName(); 
                     if (kind != null) { 
                         if (kind.equals(AbstractDocument.ContentElementName)) { 
-
-                            return new MyLabelView(elem); 
+                            return new StrekableLabellView(elem); // [HASLab] colorful electrum, strike out
                         } 
                         else if (kind.equals(AbstractDocument.ParagraphElementName)) { 
                             return new ParagraphView(elem); 
@@ -143,7 +142,8 @@ public final class OurSyntaxWidget {
       });
       if (text.length()>0) { pane.setText(text); pane.setCaretPosition(0); }
       doc.do_clearUndo();
-      for (int i = 0; i < 6; i ++) {
+      // [HASLab] colorful electrum, add the color features actions
+      for (int i = 0; i < 9; i ++) {
     	  final int k = i; 
 	      pane.getActionMap().put("alloy_c"+(i+1), new AbstractAction("alloy_c"+(i+1)) {
 	          public void actionPerformed(ActionEvent e) { try {
@@ -184,18 +184,11 @@ public final class OurSyntaxWidget {
       pane.getActionMap().put("alloy_ctrl_pagedown", new AbstractAction("alloy_ctrl_pagedown") {
          public void actionPerformed(ActionEvent e) { listeners.fire(me, Event.CTRL_PAGE_DOWN); }
       });
-      pane.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_1, InputEvent.CTRL_MASK), "alloy_c1");
-      pane.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_2, InputEvent.CTRL_MASK), "alloy_c2");
-      pane.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_3, InputEvent.CTRL_MASK), "alloy_c3");
-      pane.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_4, InputEvent.CTRL_MASK), "alloy_c4");
-      pane.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_5, InputEvent.CTRL_MASK), "alloy_c5");
-      pane.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_6, InputEvent.CTRL_MASK), "alloy_c6");
-      pane.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_1, InputEvent.CTRL_MASK | InputEvent.SHIFT_MASK), "alloy_s1");
-      pane.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_2, InputEvent.CTRL_MASK | InputEvent.SHIFT_MASK), "alloy_s2");
-      pane.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_3, InputEvent.CTRL_MASK | InputEvent.SHIFT_MASK), "alloy_s3");
-      pane.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_4, InputEvent.CTRL_MASK | InputEvent.SHIFT_MASK), "alloy_s4");
-      pane.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_5, InputEvent.CTRL_MASK | InputEvent.SHIFT_MASK), "alloy_s5");
-      pane.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_6, InputEvent.CTRL_MASK | InputEvent.SHIFT_MASK), "alloy_s6");
+      // [HASLab] colorful electrum, keyboard shortcuts
+      for (int i = 0; i < 9; i++) {
+          pane.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_1+i, InputEvent.CTRL_MASK), "alloy_c"+(i+1)); 
+          pane.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_1+i, InputEvent.CTRL_MASK | InputEvent.SHIFT_MASK), "alloy_s"+(i+1));
+      }
       pane.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_MASK), "alloy_copy");
       pane.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.CTRL_MASK), "alloy_cut");
       pane.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.CTRL_MASK), "alloy_paste");
@@ -234,9 +227,10 @@ public final class OurSyntaxWidget {
    void clearShade() { pane.getHighlighter().removeAllHighlights(); }
 
    /** Shade the range of text from start (inclusive) to end (exclusive). */
+   // [HASLab] colorful electrum, whether to strike out
    void shade(Color color, boolean strike, int start, int end) {
       int c = color.getRGB() & 0xFFFFFF;
-      if (painter==null || (painter.color.getRGB() & 0xFFFFFF)!=c)  painter = new OurHighlighter(color,strike);
+      if (painter==null || (painter.color.getRGB() & 0xFFFFFF)!=c)  painter = new OurHighlighter(color,strike); // [HASLab] colorful electrum, whether to strike out
       try { pane.getHighlighter().addHighlight(start, end, painter); } catch(Throwable ex) { } // exception is okay
    }
 
@@ -369,6 +363,8 @@ public final class OurSyntaxWidget {
    /** Transfer focus to this component. */
    public void requestFocusInWindow() { if (pane!=null) pane.requestFocusInWindow(); }
    
+   /** Retrieve the Pos of the selected text in the editor. */
+   // [HASLab] colorful electrum
    public Pos getPosSelected() {
 	   int y1 = 1+getLineOfOffset(pane.getSelectionStart());
 	   int y2 = 1+getLineOfOffset(pane.getSelectionEnd());
@@ -377,10 +373,10 @@ public final class OurSyntaxWidget {
 	   return new Pos(getFilename(), x1, y1, x2, y2);
    }
 
-   class MyLabelView extends LabelView { 
-
-	   
-	    public MyLabelView(Element elem) { 
+   /** A label view with the ability to strike out text with colors. */
+   // [HASLab] colorful electrum
+   class StrekableLabellView extends LabelView { 
+	    public StrekableLabellView(Element elem) { 
 	        super(elem); 
 	    } 
 	 
@@ -390,6 +386,7 @@ public final class OurSyntaxWidget {
 	        paintStrikeLine(g, allocation); 
 	    } 
 	 
+	    // [HASLab] colorful electrum
 	    public void paintStrikeLine(Graphics g, Shape a) { 
 	        Color c=(Color)getElement().getAttributes().getAttribute("strike-color"); 
 	        if (c!=null) { 	

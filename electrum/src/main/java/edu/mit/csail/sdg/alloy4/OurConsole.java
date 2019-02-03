@@ -105,40 +105,38 @@ public final class OurConsole extends JScrollPane {
       StyleConstants.setBold(s, boldness);
       StyleConstants.setForeground(s, color);
       StyleConstants.setLeftIndent(s, leftIndent);
-      s.removeAttribute("strike-color");
+//      s.removeAttribute("strike-color"); // [HASLab] colorful electrum, needed?
       return s;
    }
 
+   /** Helper method that construct a mutable style with the given font name, font size, boldness, color, feature coloring, and left indentation. */
+   // [HASLab] colorful electrum   
    static MutableAttributeSet style(String fontName, int fontSize, boolean boldness, Color color, Set<Color> pos, Set<Color> neg, int leftIndent) {
-	      MutableAttributeSet s = new SimpleAttributeSet();
-	      StyleConstants.setFontFamily(s, fontName);
-	      StyleConstants.setFontSize(s, fontSize);
-	      StyleConstants.setBold(s, boldness);
-	      StyleConstants.setForeground(s, color);
-	      StyleConstants.setLeftIndent(s, leftIndent);
-	      int r = 0, g = 0, b = 0;
-	      Color bg = new Color(255,255,255);
-	      if (!pos.isEmpty()) {
-	    	  for (Color c : pos) {
-	    		  r+=c.getRed(); g+=c.getGreen(); b+=c.getBlue();
-	    	  }
-	    	  int n = pos.size();
-	    	  bg = new Color(Math.min(r/n, 255),Math.min(g/n, 255),Math.min(b/n, 255));
-	      }
-    	  StyleConstants.setBackground(s, bg);
-
-    	  if (!neg.isEmpty()) {
-    	      r = 0; g = 0; b = 0;
-	    	  for (Color c : neg) {
-	    		  r+=c.getRed(); g+=c.getGreen(); b+=c.getBlue();
-	    	  }
-	    	  int n = neg.size();
-	    	  bg = new Color(Math.min(r/n, 255),Math.min(g/n, 255),Math.min(b/n, 255));
-	    	  s.addAttribute("strike-color", bg);
-    	  } else {
-	    	  s.removeAttribute("strike-color");
+      MutableAttributeSet s = style(fontName,fontSize,boldness,color,leftIndent);
+      // [HASLab] colorful electrum, mix all positive colors
+      if (!pos.isEmpty()) {
+    	  int r = 0, g = 0, b = 0;
+    	  for (Color c : pos) {
+    		  r+=c.getRed(); g+=c.getGreen(); b+=c.getBlue();
     	  }
-	      return s;
+    	  int n = pos.size();
+    	  Color bg = new Color(Math.min(r/n, 255),Math.min(g/n, 255),Math.min(b/n, 255));
+    	  StyleConstants.setBackground(s, bg);
+      }
+
+	  // [HASLab] colorful electrum, mix all negative colors
+	  if (!neg.isEmpty()) {
+	      int r = 0, g = 0, b = 0;
+    	  for (Color c : neg) {
+    		  r+=c.getRed(); g+=c.getGreen(); b+=c.getBlue();
+    	  }
+    	  int n = neg.size();
+    	  Color bg = new Color(Math.min(r/n, 255),Math.min(g/n, 255),Math.min(b/n, 255));
+    	  s.addAttribute("strike-color", bg);
+	  } else {
+    	  s.removeAttribute("strike-color");
+	  }
+      return s;
    }
    
    /** Construct a JScrollPane that allows the user to interactively type in commands and see replies.

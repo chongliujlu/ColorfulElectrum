@@ -49,7 +49,10 @@ class OurSyntaxDocument extends DefaultStyledDocument {
 	/** This ensures the class can be serialized reliably. */
 	private static final long serialVersionUID = 0;
 
-	/** The "comment mode" at the start of each line (0 = no comment) (1 = block comment) (2 = javadoc comment) (-1 = unknown) */
+	/** The style mode at the start of each line.
+	 * First field is "comment mode" (0 = no comment) (1 = block comment) (2 = javadoc comment) (-1 = unknown).
+	 * Remainder are colorful features (0 = not marked) (1 = positive mark) (2 = negative mark) (-1 = unknown). */
+	// [HASLab] colorful electrum, adapted to also consider features
 	private final List<List<Integer>> comments = new ArrayList<List<Integer>>();
 
 	/** Whether syntax highlighting is currently enabled or not. */
@@ -68,25 +71,27 @@ class OurSyntaxDocument extends DefaultStyledDocument {
 	private final List<MutableAttributeSet> all = new ArrayList<MutableAttributeSet>();
 
 	/** The character style for regular text. */
-	private final MutableAttributeSet styleNormal() { return style(font, fontSize, false, Color.BLACK,  new HashSet<Color>(), new HashSet<Color>(), 0); }
-	private final MutableAttributeSet styleNormal(List<Integer> n) { return style(font, fontSize, false, Color.BLACK, getPos(n), getNeg(n), 0); }
+	private final MutableAttributeSet styleNormal = style(font, fontSize, false, Color.BLACK, 0);
+	private final MutableAttributeSet styleNormal(List<Integer> n) { return style(font, fontSize, false, Color.BLACK, getPos(n), getNeg(n), 0); } // [HASLab] colorful electrum
 	
 	/** The character style for symbols. */
 	private final MutableAttributeSet styleSymbol  = style(font, fontSize, true, Color.BLACK, 0);           { all.add(styleSymbol); }
-	private final MutableAttributeSet styleSymbol(List<Integer> n) { return style(font, fontSize, true, Color.BLACK, getPos(n), getNeg(n), 0);          }
+	private final MutableAttributeSet styleSymbol(List<Integer> n) { return style(font, fontSize, true, Color.BLACK, getPos(n), getNeg(n), 0);          } // [HASLab] colorful electrum
 
 	/** The character style for integer constants. */
 	private final MutableAttributeSet styleNumber  = style(font, fontSize, true, new Color(0xA80A0A), 0);   { all.add(styleNumber); }
-	private final MutableAttributeSet styleNumber(List<Integer> n)  {return style(font, fontSize, true, new Color(0xA80A0A), getPos(n), getNeg(n), 0); }
+	private final MutableAttributeSet styleNumber(List<Integer> n)  {return style(font, fontSize, true, new Color(0xA80A0A), getPos(n), getNeg(n), 0); } // [HASLab] colorful electrum
 
 	/** The character style for keywords. */
 	private final MutableAttributeSet styleKeyword = style(font, fontSize, true, new Color(0x1E1EA8), 0);   { all.add(styleKeyword); }
-	private final MutableAttributeSet styleKeyword(List<Integer> n) { return style(font, fontSize, true, new Color(0x1E1EA8), getPos(n), getNeg(n), 0);}
+	private final MutableAttributeSet styleKeyword(List<Integer> n) { return style(font, fontSize, true, new Color(0x1E1EA8), getPos(n), getNeg(n), 0);} // [HASLab] colorful electrum
 
 	/** The character style for string literals. */
 	private final MutableAttributeSet styleString  = style(font, fontSize, false, new Color(0xA80AA8), 0);  { all.add(styleString); }
-	private final MutableAttributeSet styleString(List<Integer> n) { return style(font, fontSize, false, new Color(0xA80AA8), getPos(n), getNeg(n), 0); }
+	private final MutableAttributeSet styleString(List<Integer> n) { return style(font, fontSize, false, new Color(0xA80AA8), getPos(n), getNeg(n), 0); } // [HASLab] colorful electrum
 
+	/** The character style for featured text. */
+	// [HASLab] colorful electrum
 	private final MutableAttributeSet styleColor(List<Integer> n, Color c) { return style(font, fontSize, true, new Color(c.getRed()-41,c.getGreen()-41,c.getBlue()-41), getPos(n), getNeg(n), 0); }
 
 	/** The character style for up-to-end-of-line-style comment. */
@@ -101,8 +106,12 @@ class OurSyntaxDocument extends DefaultStyledDocument {
 	/** The paragraph style for indentation. */
 	private final MutableAttributeSet tabset = new SimpleAttributeSet();
 
+	/** The colors of each of the features. */
+	// [HASLab] colorful electrum
 	static Color C[] =  {new Color(255,225,205),new Color(255,205,225),new Color(205,255,225),new Color(225,255,205),new Color(205,225,255),new Color(225,205,255)};
 	
+	/** Convert the list of positive features (1) into a list of colors. */
+	// [HASLab] colorful electrum
 	private static Set<Color> getPos(List<Integer> n) {
 		Set<Color> res = new HashSet<Color>();
 		for (int i = 1; i <= 6; i++)
@@ -110,6 +119,8 @@ class OurSyntaxDocument extends DefaultStyledDocument {
 		return res;
 	}
 	
+	/** Convert the list of negative features (2) into a list of colors. */
+	// [HASLab] colorful electrum
 	private static Set<Color> getNeg(List<Integer> n) {
 		Set<Color> res = new HashSet<Color>();
 		for (int i = 1; i <= 6; i++)
@@ -121,8 +132,7 @@ class OurSyntaxDocument extends DefaultStyledDocument {
 		"disjoint", "else", "enum", "exactly", "exh", "exhaustive", "expect", "extends", "fact", "for", "fun", "iden",
 		"iff", "implies", "in", "Int", "int", "let", "lone", "module", "no", "none", "not", "one", "open", "or", "part",
 		"partition", "pred", "private", "run", "seq", "set", "sig", "some", "String", "sum", "this", "univ", 
-		"eventually", "always", "after", "once", "historically", "since", "trigger", "previous", "until", "release", "Time", // [HASLab] temporal keywords
-		"feature"
+		"eventually", "always", "after", "once", "historically", "since", "trigger", "previous", "until", "release", "Time" // [HASLab] temporal keywords
 	};
 
 	/** Returns true if array[start .. start+len-1] matches one of the reserved keyword. */
@@ -139,12 +149,19 @@ class OurSyntaxDocument extends DefaultStyledDocument {
 		return (c>='A' && c<='Z') || (c>='a' && c<='z') || c=='$' || (c>='0' && c<='9') || c=='_' /*|| c=='\''*/ || c=='\"'; // [HASLab] primed expressions
 	}
 	
-	public static char O1 = '➀', E1 = '➊';
+	/** The first positive/negative color feature delimiters. */
+	// [HASLab] colorful electrum
+	public static char O1 = '\u2780', E1 = '\u278A';
 	
-	private static final boolean do_colorO(char c) {
+	/** Whether a positive color feature delimiter. */
+	// [HASLab] colorful electrum
+	private static final boolean isPositiveColor(char c) {
 		return (c>=O1 && c<=(char)(O1+5));
 	}
-	private static final boolean do_colorE(char c) {
+
+	/** Whether a negative color feature delimiter. */
+	// [HASLab] colorful electrum
+	private static final boolean isNegativeColor(char c) {
 		return (c>=E1 && c<=(char)(E1+5));
 	}
 	
@@ -158,7 +175,7 @@ class OurSyntaxDocument extends DefaultStyledDocument {
 	/** Enables or disables syntax highlighting. */
 	public final void do_enableSyntax (boolean flag) {
 		if (enabled == flag) return; else { enabled = flag;  comments.clear(); }
-		if (flag) do_reapplyAll(); else setCharacterAttributes(0, getLength(), styleNormal(), false);
+		if (flag) do_reapplyAll(); else setCharacterAttributes(0, getLength(), styleNormal, false);
 	}
 
 	/** Return the number of lines represented by the current text (where partial line counts as a line).
@@ -190,12 +207,13 @@ class OurSyntaxDocument extends DefaultStyledDocument {
 	 */
 	@Override public void insertString(int offset, String string, AttributeSet attr) throws BadLocationException {
 		if (string.indexOf('\r')>=0) string = Util.convertLineBreak(string); // we don't want '\r'
-		if (!enabled) { super.insertString(offset, string, styleNormal()); return; }
+		if (!enabled) { super.insertString(offset, string, styleNormal); return; }
 		int startLine = do_getLineOfOffset(offset);
+		// [HASLab] color modes
 		for(int i = 0; i < string.length(); i++) { // For each inserted '\n' we need to shift the values in "comments" array down
 			if (string.charAt(i)=='\n') { if (startLine < comments.size()-1) comments.add(startLine+1, Arrays.asList(-1,-1,-1,-1,-1,-1,-1)); }
 		}
-		super.insertString(offset, string, styleNormal());
+		super.insertString(offset, string, styleNormal);
 		try { do_update(startLine); } catch(Exception ex) { comments.clear(); }
 	}
 
@@ -213,13 +231,14 @@ class OurSyntaxDocument extends DefaultStyledDocument {
 	/** This method is called by Swing to replace text in this document. */
 	@Override public void replace(int offset, int length, String string, AttributeSet attrs) throws BadLocationException {
 		if (length > 0) this.remove(offset, length);
-		if (string != null && string.length() > 0) this.insertString(offset, string, styleNormal());
+		if (string != null && string.length() > 0) this.insertString(offset, string, styleNormal);
 	}
 
 	/** Reapply styles assuming the given line has just been modified */
 	private final void do_update(int line) throws BadLocationException  {
 		String content = toString();
 		int lineCount = do_getLineCount();
+		// [HASLab] color modes
 		while(line>0 && (line>=comments.size() || comments.get(line).get(0)<0)) line--; // "-1" in comments array are always contiguous
 		List<Integer> comment = do_reapply(line==0 ? Arrays.asList(0,0,0,0,0,0,0) : new ArrayList<Integer>(comments.get(line)), content, line);
 		for (line++; line < lineCount; line++) { // update each subsequent line until it already starts with its expected comment mode
@@ -227,15 +246,17 @@ class OurSyntaxDocument extends DefaultStyledDocument {
 		}
 	}
 
-	/** Re-color the given line assuming it starts with a given comment mode, then return the comment mode for start of next line. */
+	/** Re-color the given line assuming it starts with a given style mode, then return the style mode for start of next line. */
+	// [HASLab] colorful electrum, list of color modes rather than single comment mode
 	private final List<Integer> do_reapply(List<Integer> comment, final String txt, final int line) {
+		// [HASLab] color modes
 		while (line >= comments.size()) comments.add(Arrays.asList(-1,-1,-1,-1,-1,-1,-1)); // enlarge array if needed
-		comments.set(line, new ArrayList<Integer>(comment));                      // record the fact that this line starts with the given comment mode
+		comments.set(line, new ArrayList<Integer>(comment));                               // record the fact that this line starts with the given comment mode
 		for(int n = txt.length(), i = do_getLineStartOffset(line); i < n;) {
 			final int oldi = i;
 			final char c = txt.charAt(i);
 			if (c=='\n') break;
-
+			// [HASLab] comment mode is at position 0
 			if (comment.get(0)==0 && c=='/' && i<n-3 && txt.charAt(i+1)=='*' && txt.charAt(i+2)=='*' && txt.charAt(i+3)!='/') comment.set(0,2);
 			if (comment.get(0)==0 && c=='/' && i==n-3 && txt.charAt(i+1)=='*' && txt.charAt(i+2)=='*') comment.set(0,2);
 			if (comment.get(0)==0 && c=='/' && i<n-1 && txt.charAt(i+1)=='*') { comment.set(0,1); i = i + 2; }
@@ -255,22 +276,24 @@ class OurSyntaxDocument extends DefaultStyledDocument {
 					if (txt.charAt(i)=='\\' && i+1<n && txt.charAt(i+1)!='\n') i++;
 				}
 				setCharacterAttributes(oldi, i-oldi, styleString(comment), false);
-			} else if (do_colorE(c) || do_colorO(c)) {
-				boolean f = true;
+			} else if (isNegativeColor(c) || isPositiveColor(c)) { // [HASLab] colorful electrum, check for delimiters and change style mode
 				i++;
-				if (do_colorO(c) && comment.get(c-O1+1) != 0) {comment.set(c-O1+1,0);f=!f;}
-				else if (do_colorE(c) && comment.get(c-E1+1) != 0) {comment.set(c-E1+1,0);f=!f;}
-				for (int k = 0; k < 6; k++)
+				boolean opens = true;
+				// if already with style, invert
+				if (isPositiveColor(c) && comment.get(c-O1+1) != 0) {comment.set(c-O1+1,0);opens=false;}
+				else if (isNegativeColor(c) && comment.get(c-E1+1) != 0) {comment.set(c-E1+1,0);opens=false;}
+				for (int k = 0; k < 6; k++) // paint the delimiters
 					if (c == (char) (O1+k) || c == (char) (E1+k)) setCharacterAttributes(oldi, i-oldi, styleColor(comment,C[k]), false);
-				if (f && do_colorO(c) && comment.get(c-O1+1) == 0) {comment.set(c-O1+1,1);}	
-				else if (f && do_colorE(c) && comment.get(c-E1+1) == 0) {comment.set(c-E1+1,2);}
+				// if not in style, apply
+				if (opens && isPositiveColor(c) && comment.get(c-O1+1) == 0) {comment.set(c-O1+1,1);}	
+				else if (opens && isNegativeColor(c) && comment.get(c-E1+1) == 0) {comment.set(c-E1+1,2);}
 			}
 			else if(do_iden(c)) {
 				for(i++; i<n && do_iden(txt.charAt(i)); i++) { }
 				AttributeSet style = (c>='0' && c<='9') ? styleNumber(comment) : (do_keyword(txt, oldi, i-oldi) ? styleKeyword(comment) : styleNormal(comment));
 				setCharacterAttributes(oldi, i-oldi, style, true);
 			} else {
-				for(i++; i<n && !do_iden(txt.charAt(i)) && txt.charAt(i)!='\n' && txt.charAt(i)!='-' && txt.charAt(i)!='/' && !do_colorO(txt.charAt(i)) && !do_colorE(txt.charAt(i)); i++) { }
+				for(i++; i<n && !do_iden(txt.charAt(i)) && txt.charAt(i)!='\n' && txt.charAt(i)!='-' && txt.charAt(i)!='/' && !isPositiveColor(txt.charAt(i)) && !isNegativeColor(txt.charAt(i)); i++) { }
 				setCharacterAttributes(oldi, i-oldi, styleSymbol(comment), true);
 			}
 		}
@@ -279,9 +302,10 @@ class OurSyntaxDocument extends DefaultStyledDocument {
 
 	/** Reapply the appropriate style to the entire document. */
 	private final void do_reapplyAll() {
-		setCharacterAttributes(0, getLength(), styleNormal(), true);
+		setCharacterAttributes(0, getLength(), styleNormal, true);
 		comments.clear();
 		String content = toString();
+		// [HASLab] color modes
 		List<Integer> comment = Arrays.asList(0,0,0,0,0,0,0);
 		for(int i = 0, n = do_getLineCount(); i < n; i++)  { comment = new ArrayList<Integer>(do_reapply(comment, content, i)); }
 	}
