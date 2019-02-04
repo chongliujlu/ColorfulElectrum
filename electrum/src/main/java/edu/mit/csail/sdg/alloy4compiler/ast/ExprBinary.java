@@ -20,7 +20,9 @@ import static edu.mit.csail.sdg.alloy4compiler.ast.Type.EMPTY;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import edu.mit.csail.sdg.alloy4.Err;
 import edu.mit.csail.sdg.alloy4.ErrorSyntax;
@@ -63,7 +65,7 @@ public final class ExprBinary extends Expr {
 
    /** Constructs a new ExprBinary node. */
    // [HASLab] colorful electrum
-   private ExprBinary(Pos pos, Pos closingBracket, Op op, Expr left, Expr right, Type type, JoinableList<Err> errors, int color) {
+   private ExprBinary(Pos pos, Pos closingBracket, Op op, Expr left, Expr right, Type type, JoinableList<Err> errors, Set<Integer> color) {
       super(pos,
             closingBracket,
             left.ambiguous || right.ambiguous,
@@ -217,7 +219,7 @@ public final class ExprBinary extends Expr {
        */
       public final boolean isArrow;
 
-      public final Expr make(Pos pos, Pos closingBracket, Expr left, Expr right) { return make(pos,closingBracket,left,right,0); }
+      public final Expr make(Pos pos, Pos closingBracket, Expr left, Expr right) { return make(pos,closingBracket,left,right,new HashSet<Integer>()); }
 
       /** Constructs a new ExprBinary node.
        * @param pos - the original position in the source file (can be null if unknown)
@@ -225,7 +227,7 @@ public final class ExprBinary extends Expr {
        * @param right - the right hand side expression
        */
       // [HASLab] colorful electrum
-      public final Expr make(Pos pos, Pos closingBracket, Expr left, Expr right, int color) {
+      public final Expr make(Pos pos, Pos closingBracket, Expr left, Expr right, Set<Integer> color) {
          switch(this) {
            case AND: return ExprList.makeAND(pos, closingBracket, left, right);
            case OR: return ExprList.makeOR(pos, closingBracket, left, right);

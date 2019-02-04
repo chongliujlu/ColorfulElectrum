@@ -16,7 +16,9 @@
 package edu.mit.csail.sdg.alloy4compiler.ast;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import edu.mit.csail.sdg.alloy4.Err;
 import edu.mit.csail.sdg.alloy4.ErrorSyntax;
@@ -75,7 +77,7 @@ public final class ExprLet extends Expr {
 
     /** Constructs a LET expression. */
     // [HASLab] colorful electrum
-    private ExprLet(Pos pos, ExprVar var, Expr expr, Expr sub, JoinableList<Err> errs, int color) {
+    private ExprLet(Pos pos, ExprVar var, Expr expr, Expr sub, JoinableList<Err> errs, Set<Integer> color) {
         super(pos, null, expr.ambiguous || sub.ambiguous, sub.type, 0, var.weight + expr.weight + sub.weight, errs, color);
         this.var = var;
         this.expr = expr;
@@ -86,7 +88,7 @@ public final class ExprLet extends Expr {
 
     // [HASLab] colorful electrum
     public static Expr make(Pos pos, ExprVar var, Expr expr, Expr sub) {
-    	return make(pos,var,expr,sub,0);
+    	return make(pos,var,expr,sub,new HashSet<Integer>());
     }
     
     /** Constructs a LET expression.
@@ -96,7 +98,7 @@ public final class ExprLet extends Expr {
      * @param sub - the body of the LET expression (which may or may not contain "var" as a free variable)
      */
     // [HASLab] colorful electrum
-    public static Expr make(Pos pos, ExprVar var, Expr expr, Expr sub, int color) {
+    public static Expr make(Pos pos, ExprVar var, Expr expr, Expr sub, Set<Integer> color) {
         if (expr.ambiguous) expr = expr.resolve(expr.type, null);
         JoinableList<Err> errs = var.errors.make(expr.errors).make(sub.errors);
         if (expr.mult!=0)

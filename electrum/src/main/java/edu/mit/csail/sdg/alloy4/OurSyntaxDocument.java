@@ -108,14 +108,17 @@ class OurSyntaxDocument extends DefaultStyledDocument {
 
 	/** The colors of each of the features. */
 	// [HASLab] colorful electrum
-	static Color C[] =  {new Color(255,225,205),new Color(255,205,225),new Color(205,255,225),new Color(225,255,205),new Color(205,225,255),new Color(225,205,255)};
+	static Color C[] = {new Color(255,225,205),new Color(255,205,225),new Color(205,255,225),
+						new Color(225,255,205),new Color(225,205,255),new Color(205,225,255),
+						new Color(225,255,225),new Color(225,225,255),new Color(255,225,225)};
 	
 	/** Convert the list of positive features (1) into a list of colors. */
 	// [HASLab] colorful electrum
 	private static Set<Color> getPos(List<Integer> n) {
 		Set<Color> res = new HashSet<Color>();
-		for (int i = 1; i <= 6; i++)
-			if (n.get(i) == 1) res.add(C[i-1]);
+		for (int i = 1; i <= 9; i++)
+			if (n.get(i) == 1) 
+					res.add(C[i-1]);
 		return res;
 	}
 	
@@ -123,7 +126,7 @@ class OurSyntaxDocument extends DefaultStyledDocument {
 	// [HASLab] colorful electrum
 	private static Set<Color> getNeg(List<Integer> n) {
 		Set<Color> res = new HashSet<Color>();
-		for (int i = 1; i <= 6; i++)
+		for (int i = 1; i <= 9; i++)
 			if (n.get(i) == 2) res.add(C[i-1]);
 		return res;	}
 	
@@ -156,13 +159,13 @@ class OurSyntaxDocument extends DefaultStyledDocument {
 	/** Whether a positive color feature delimiter. */
 	// [HASLab] colorful electrum
 	private static final boolean isPositiveColor(char c) {
-		return (c>=O1 && c<=(char)(O1+5));
+		return (c>=O1 && c<=(char)(O1+8));
 	}
 
 	/** Whether a negative color feature delimiter. */
 	// [HASLab] colorful electrum
 	private static final boolean isNegativeColor(char c) {
-		return (c>=E1 && c<=(char)(E1+5));
+		return (c>=E1 && c<=(char)(E1+8));
 	}
 	
 	/** Constructor. */
@@ -211,7 +214,7 @@ class OurSyntaxDocument extends DefaultStyledDocument {
 		int startLine = do_getLineOfOffset(offset);
 		// [HASLab] color modes
 		for(int i = 0; i < string.length(); i++) { // For each inserted '\n' we need to shift the values in "comments" array down
-			if (string.charAt(i)=='\n') { if (startLine < comments.size()-1) comments.add(startLine+1, Arrays.asList(-1,-1,-1,-1,-1,-1,-1)); }
+			if (string.charAt(i)=='\n') { if (startLine < comments.size()-1) comments.add(startLine+1, Arrays.asList(-1,-1,-1,-1,-1,-1,-1,-1,-1,-1)); }
 		}
 		super.insertString(offset, string, styleNormal);
 		try { do_update(startLine); } catch(Exception ex) { comments.clear(); }
@@ -240,7 +243,7 @@ class OurSyntaxDocument extends DefaultStyledDocument {
 		int lineCount = do_getLineCount();
 		// [HASLab] color modes
 		while(line>0 && (line>=comments.size() || comments.get(line).get(0)<0)) line--; // "-1" in comments array are always contiguous
-		List<Integer> comment = do_reapply(line==0 ? Arrays.asList(0,0,0,0,0,0,0) : new ArrayList<Integer>(comments.get(line)), content, line);
+		List<Integer> comment = do_reapply(line==0 ? Arrays.asList(0,0,0,0,0,0,0,0,0,0) : new ArrayList<Integer>(comments.get(line)), content, line);
 		for (line++; line < lineCount; line++) { // update each subsequent line until it already starts with its expected comment mode
 			if (line < comments.size() && comments.get(line).equals(comment)) break; else { comment = do_reapply(comment, content, line);}
 		}
@@ -250,7 +253,7 @@ class OurSyntaxDocument extends DefaultStyledDocument {
 	// [HASLab] colorful electrum, list of color modes rather than single comment mode
 	private final List<Integer> do_reapply(List<Integer> comment, final String txt, final int line) {
 		// [HASLab] color modes
-		while (line >= comments.size()) comments.add(Arrays.asList(-1,-1,-1,-1,-1,-1,-1)); // enlarge array if needed
+		while (line >= comments.size()) comments.add(Arrays.asList(-1,-1,-1,-1,-1,-1,-1,-1,-1,-1)); // enlarge array if needed
 		comments.set(line, new ArrayList<Integer>(comment));                               // record the fact that this line starts with the given comment mode
 		for(int n = txt.length(), i = do_getLineStartOffset(line); i < n;) {
 			final int oldi = i;
@@ -282,7 +285,7 @@ class OurSyntaxDocument extends DefaultStyledDocument {
 				// if already with style, invert
 				if (isPositiveColor(c) && comment.get(c-O1+1) != 0) {comment.set(c-O1+1,0);opens=false;}
 				else if (isNegativeColor(c) && comment.get(c-E1+1) != 0) {comment.set(c-E1+1,0);opens=false;}
-				for (int k = 0; k < 6; k++) // paint the delimiters
+				for (int k = 0; k < 9; k++) // paint the delimiters
 					if (c == (char) (O1+k) || c == (char) (E1+k)) setCharacterAttributes(oldi, i-oldi, styleColorMark(comment,C[k]), true);
 				// if not in style, apply
 				if (opens && isPositiveColor(c) && comment.get(c-O1+1) == 0) {comment.set(c-O1+1,1);}	
@@ -306,7 +309,7 @@ class OurSyntaxDocument extends DefaultStyledDocument {
 		comments.clear();
 		String content = toString();
 		// [HASLab] color modes
-		List<Integer> comment = Arrays.asList(0,0,0,0,0,0,0);
+		List<Integer> comment = Arrays.asList(0,0,0,0,0,0,0,0,0,0);
 		for(int i = 0, n = do_getLineCount(); i < n; i++)  { comment = new ArrayList<Integer>(do_reapply(comment, content, i)); }
 	}
 

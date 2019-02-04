@@ -22,8 +22,10 @@ import static edu.mit.csail.sdg.alloy4compiler.ast.Type.EMPTY;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import edu.mit.csail.sdg.alloy4.Err;
 import edu.mit.csail.sdg.alloy4.ErrorType;
@@ -46,8 +48,12 @@ import edu.mit.csail.sdg.alloy4compiler.ast.Sig.PrimSig;
 
 public abstract class Expr extends Browsable {
 
-   public int color;
-   public Expr paint(int c) {color=c;return this;}
+   // [HASLab] colorful electrum
+   public Set<Integer> color = new HashSet<Integer>();
+   // [HASLab] colorful electrum
+   public Expr paint(int c) {color.add(c);return this;}
+   // [HASLab] colorful electrum
+   public Expr paint(Collection<Integer> c) {color.addAll(c);return this;}
 	
    /** The filename, line, and column position in the original Alloy model file (cannot be null). */
    public final Pos pos;
@@ -109,7 +115,7 @@ public abstract class Expr extends Browsable {
     * @param errors - the list of errors associated with this Expr node (can be null if there are none)
     */
    // [HASLab] colorful electrum
-   Expr (Pos pos, Pos closingBracket, boolean ambiguous, Type type, int mult, long weight, JoinableList<Err> errors, int color) {
+   Expr (Pos pos, Pos closingBracket, boolean ambiguous, Type type, int mult, long weight, JoinableList<Err> errors, Set<Integer> color) {
 	  this.pos = (pos==null ? Pos.UNKNOWN : pos);
       this.closingBracket = (closingBracket==null ? Pos.UNKNOWN : closingBracket);
       this.ambiguous      = ambiguous;
@@ -124,7 +130,8 @@ public abstract class Expr extends Browsable {
    }
 
    /** This must only be called by Sig's constructor. */
-   Expr (Pos pos, Type type) {
+   Expr (Pos pos, Type type, Set<Integer> color) {
+	  // [HASLab] colorful electrum
       this.closingBracket = Pos.UNKNOWN;
       this.ambiguous = false;
       this.errors = emptyListOfErrors;
@@ -132,6 +139,7 @@ public abstract class Expr extends Browsable {
       this.type   = (type==null || type==EMPTY) ? Type.make((PrimSig)this) : type;
       this.mult   = 0;
       this.weight = 0;
+      this.color = color;
    }
 
    /** {@inheritDoc} */

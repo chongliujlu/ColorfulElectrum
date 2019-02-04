@@ -19,7 +19,9 @@ import static edu.mit.csail.sdg.alloy4compiler.ast.Type.EMPTY;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import edu.mit.csail.sdg.alloy4.ConstList;
 import edu.mit.csail.sdg.alloy4.Err;
@@ -84,7 +86,7 @@ public final class ExprChoice extends Expr {
 
     /** Constructs an ExprChoice node. */
     // [HASLab] colorful electrum
-    private ExprChoice(Pos pos, ConstList<Expr> choices, ConstList<String> reasons, Type type, long weight, int color) {
+    private ExprChoice(Pos pos, ConstList<Expr> choices, ConstList<String> reasons, Type type, long weight, Set<Integer> color) {
         super(pos, null, true, type, 0, weight, emptyListOfErrors.make(type==EMPTY ? complain(pos,choices) : null), color);
         this.choices = choices;
         this.reasons = reasons;
@@ -94,12 +96,12 @@ public final class ExprChoice extends Expr {
 
     // [HASLab] colorful electrum
     public static Expr make(Pos pos, ConstList<Expr> choices, ConstList<String> reasons) {
-    	return make(pos,choices,reasons,0);
+    	return make(pos,choices,reasons,new HashSet<Integer>());
     }
         
     /** Construct an ExprChoice node. */
     // [HASLab] colorful electrum
-    public static Expr make(Pos pos, ConstList<Expr> choices, ConstList<String> reasons, int color) {
+    public static Expr make(Pos pos, ConstList<Expr> choices, ConstList<String> reasons, Set<Integer> color) {
         if (choices.size()==0) return new ExprBad(pos, "", new ErrorType(pos, "This expression failed to be typechecked."));
         if (choices.size()==1 && choices.get(0).errors.isEmpty()) return choices.get(0); // Shortcut
         Type type=EMPTY;
@@ -116,7 +118,7 @@ public final class ExprChoice extends Expr {
 
     /** Resolve the list of choices, or return an ExprBad object containing the list of unresolvable ambiguities. */
     // [HASLab] colorful electrum
-    private Expr resolveHelper(boolean firstPass, final Type t, List<Expr> choices, List<String> reasons, Collection<ErrorWarning> warns, int color) {
+    private Expr resolveHelper(boolean firstPass, final Type t, List<Expr> choices, List<String> reasons, Collection<ErrorWarning> warns, Set<Integer> color) {
         List<Expr> ch = new ArrayList<Expr>(choices.size());
         List<String> re = new ArrayList<String>(choices.size());
         // We first prefer exact matches

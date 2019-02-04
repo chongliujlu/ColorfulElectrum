@@ -24,6 +24,7 @@ import static edu.mit.csail.sdg.alloy4compiler.ast.Sig.UNIV;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -325,7 +326,7 @@ public final class A4SolutionReader {
 			}
 		if (field == null)
 			field = parent.addTrickyField(Pos.UNKNOWN, isPrivate, null, null, isMeta, isVar, new String[] { label }, // [HASLab]
-					UNIV.join(type),0)[0]; // [HASLab] colorful electrum
+					UNIV.join(type),new HashSet<Integer>())[0]; // [HASLab] colorful electrum
 		TupleSet ts = parseTuples(node, arity);
 		expr2ts.put(field, ts);
 		return field;

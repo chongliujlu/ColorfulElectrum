@@ -19,8 +19,10 @@ import static edu.mit.csail.sdg.alloy4compiler.ast.Type.EMPTY;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Set;
 
 import edu.mit.csail.sdg.alloy4.ConstList;
 import edu.mit.csail.sdg.alloy4.ConstList.TempList;
@@ -127,7 +129,7 @@ public final class ExprQt extends Expr {
 
    /** Constructs a new quantified expression. */
    // [HASLab] colorful electrum
-   private ExprQt (Pos pos, Pos closingBracket, Op op, Type type, ConstList<Decl> decls, Expr sub, boolean ambiguous, long weight, JoinableList<Err> errs, int color) {
+   private ExprQt (Pos pos, Pos closingBracket, Op op, Type type, ConstList<Decl> decls, Expr sub, boolean ambiguous, long weight, JoinableList<Err> errs, Set<Integer> color) {
       super(pos, closingBracket, ambiguous, type, 0, weight, errs, color); // [HASLab] colorful electrum
       this.op = op;
       this.decls = decls;
@@ -154,7 +156,7 @@ public final class ExprQt extends Expr {
 
       // [HASLab] colorful electrum
       public final Expr make(Pos pos, Pos closingBracket, List<Decl> decls, Expr sub) {
-    	  return make(pos,closingBracket,decls,sub,0);
+    	  return make(pos,closingBracket,decls,sub,new HashSet<Integer>());
       }
       
       /** Constructs a quantification expression with "this" as the operator.
@@ -165,7 +167,7 @@ public final class ExprQt extends Expr {
        * @param sub - the body of the expression
        */
       // [HASLab] colorful electrum
-      public final Expr make(Pos pos, Pos closingBracket, List<Decl> decls, Expr sub, int color) {
+      public final Expr make(Pos pos, Pos closingBracket, List<Decl> decls, Expr sub, Set<Integer> color) {
          Type t = this==SUM ? Type.smallIntType() : (this==COMPREHENSION ? Type.EMPTY : Type.FORMULA);
          if (this!=SUM) sub = sub.typecheck_as_formula(); else sub = sub.typecheck_as_int();
          boolean ambiguous = sub.ambiguous;

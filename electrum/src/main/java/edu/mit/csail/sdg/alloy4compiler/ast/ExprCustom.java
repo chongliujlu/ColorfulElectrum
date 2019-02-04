@@ -18,6 +18,7 @@ package edu.mit.csail.sdg.alloy4compiler.ast;
 import static edu.mit.csail.sdg.alloy4compiler.ast.Type.EMPTY;
 
 import java.util.Collection;
+import java.util.Set;
 
 import edu.mit.csail.sdg.alloy4.Err;
 import edu.mit.csail.sdg.alloy4.ErrorWarning;
@@ -39,7 +40,7 @@ public abstract class ExprCustom extends Expr {
      * @param error - the error to display if this node does not get desugared
      */
     // [HASLab] colorful electrum
-    public ExprCustom(Pos pos, Err error, int color) {
+    public ExprCustom(Pos pos, Err error, Set<Integer> color) {
         super(pos, null, false, EMPTY, 0, 0, new JoinableList<Err>(error), color);
         if (error==null) throw new NullPointerException();
     }

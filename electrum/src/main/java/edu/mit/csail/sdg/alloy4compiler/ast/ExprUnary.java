@@ -21,8 +21,10 @@ import static edu.mit.csail.sdg.alloy4compiler.ast.Sig.UNIV;
 import static edu.mit.csail.sdg.alloy4compiler.ast.Type.EMPTY;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import edu.mit.csail.sdg.alloy4.DirectedGraph;
 import edu.mit.csail.sdg.alloy4.Err;
@@ -91,7 +93,7 @@ public final class ExprUnary extends Expr {
 
     /** Constructs an unary expression. */
     // [HASLab] colorful electrum
-    private ExprUnary(Pos pos, Op op, Expr sub, Type type, long weight, JoinableList<Err> errors, int color) {
+    private ExprUnary(Pos pos, Op op, Expr sub, Type type, long weight, JoinableList<Err> errors, Set<Integer> color) {
         super(pos, null, sub.ambiguous, type, (op==Op.EXACTLYOF||op==Op.SOMEOF||op==Op.LONEOF||op==Op.ONEOF||op==Op.SETOF)?1:0, weight, errors, color);
         this.op = op;
         this.sub = sub;
@@ -155,9 +157,11 @@ public final class ExprUnary extends Expr {
          */
         public final Expr make(Pos pos, Expr sub) { return make(pos, sub, null, 0); }
 
-        public final Expr make(Pos pos, Expr sub, int c) { return make(pos, sub, null, 0, c); }
+        // [HASLab] colorful electrum
+        public final Expr make(Pos pos, Expr sub, Set<Integer> color) { return make(pos, sub, null, 0, color); }
 
-        public final Expr make(Pos pos, Expr sub, Err extraError, long extraWeight) { return make(pos,sub,extraError,extraWeight,0); }
+        // [HASLab] colorful electrum
+        public final Expr make(Pos pos, Expr sub, Err extraError, long extraWeight) { return make(pos,sub,extraError,extraWeight,new HashSet<Integer>()); }
 
         /** Construct an ExprUnary node.
          * @param pos - the original position of the "unary operator" in the file (can be null if unknown)
@@ -171,7 +175,7 @@ public final class ExprUnary extends Expr {
          * <br> (This desugaring is done by the ExprUnary.Op.make() method, so ExprUnary's constructor never sees it)
          */
         // [HASLab] colorful electrum
-        public final Expr make(Pos pos, Expr sub, Err extraError, long extraWeight, int color) {
+        public final Expr make(Pos pos, Expr sub, Err extraError, long extraWeight, Set<Integer> color) {
             if (pos==null || pos==Pos.UNKNOWN) { if (this==NOOP) pos = sub.pos; else pos = sub.span(); }
             JoinableList<Err> errors = sub.errors.make(extraError);
             if (sub.mult!=0) {

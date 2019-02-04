@@ -16,7 +16,9 @@
 
 package edu.mit.csail.sdg.alloy4compiler.ast;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import edu.mit.csail.sdg.alloy4.ConstList;
 import edu.mit.csail.sdg.alloy4.Pos;
@@ -28,8 +30,10 @@ import edu.mit.csail.sdg.alloy4.Pos;
 
 public final class Decl {
 
-	public int color;
-   	public Decl paint(int c) {color=c;return this;}
+	// [HASLab] colorful electrum
+	public Set<Integer> color = new HashSet<Integer>();
+   	// [HASLab] colorful electrum
+   	public Decl paint(int c) {color.add(c);return this;}
 
     /** If nonnull, then this decl is private (and this.isPrivate is the location of the "private" keyword) */
     public final Pos isPrivate;
@@ -66,12 +70,12 @@ public final class Decl {
 
     // [HASLab] colorful electrum
     public Decl(Pos isVar, Pos isPrivate, Pos disjoint, Pos disjoint2, List<? extends ExprHasName> names, Expr expr) {
-    	this(isVar,isPrivate,disjoint,disjoint2,names,expr,0);
+    	this(isVar,isPrivate,disjoint,disjoint2,names,expr,new HashSet<Integer>());
     }
 
     /** This constructs a declaration; the list of names must not be empty. */
     // [HASLab]: extended with variable declarations for fields, colorful electrum
-    public Decl(Pos isVar, Pos isPrivate, Pos disjoint, Pos disjoint2, List<? extends ExprHasName> names, Expr expr, int color) {
+    public Decl(Pos isVar, Pos isPrivate, Pos disjoint, Pos disjoint2, List<? extends ExprHasName> names, Expr expr, Set<Integer> color) {
        if (names.size()==0) throw new NullPointerException();
        this.isVar = isVar; // [HASLab]
        this.isPrivate = isPrivate;

@@ -15,6 +15,8 @@
 
 package edu.mit.csail.sdg.alloy4compiler.ast;
 
+import java.util.Set;
+
 import edu.mit.csail.sdg.alloy4.Pos;
 
 /** Immutable; represents a named entity (such as a Field, or a LET or QUANTIFICATION variable, or a function/predicate parameter). */
@@ -26,7 +28,7 @@ public abstract class ExprHasName extends Expr {
     
     /** Constructs an ExprHasName object */
     // [HASLab] colorful electrum
-    ExprHasName(Pos pos, String label, Type type, int color) {
+    ExprHasName(Pos pos, String label, Type type, Set<Integer> color) {
         super(pos, null, false, type, 0, 0, null, color);
         this.label = (label==null ? "" : label);
     }

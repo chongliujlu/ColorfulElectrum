@@ -18,7 +18,9 @@ package edu.mit.csail.sdg.alloy4compiler.ast;
 import static edu.mit.csail.sdg.alloy4compiler.ast.Type.EMPTY;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import edu.mit.csail.sdg.alloy4.Err;
 import edu.mit.csail.sdg.alloy4.ErrorSyntax;
@@ -75,7 +77,7 @@ public final class ExprITE extends Expr {
 
     /** Constructs a ExprITE expression. */
     // [HASLab] colorful electrum
-    private ExprITE(Pos pos, Expr cond, Expr left, Expr right, Type type, JoinableList<Err> errs, int color) {
+    private ExprITE(Pos pos, Expr cond, Expr left, Expr right, Type type, JoinableList<Err> errs, Set<Integer> color) {
         super(pos, null, (cond.ambiguous || left.ambiguous || (right!=null && right.ambiguous)), type, 0, cond.weight+left.weight+(right!=null ? right.weight : 0), errs, color);
         this.cond = cond;
         this.left = left;
@@ -93,7 +95,7 @@ public final class ExprITE extends Expr {
 
     // [HASLab] colorful electrum
     public static Expr make(Pos pos, Expr cond, Expr left, Expr right) {
-    	return make(pos,cond,left,right,0);
+    	return make(pos,cond,left,right,new HashSet<Integer>());
     }
 
     /** Constructs a ExprITE expression.
@@ -103,7 +105,7 @@ public final class ExprITE extends Expr {
      * @param right - the else-clause
      */
     // [HASLab] colorful electrum
-    public static Expr make(Pos pos, Expr cond, Expr left, Expr right, int color) {
+    public static Expr make(Pos pos, Expr cond, Expr left, Expr right, Set<Integer> color) {
         JoinableList<Err> errs = emptyListOfErrors;
         if (cond.mult != 0) errs = errs.make(new ErrorSyntax(cond.span(), "Multiplicity expression not allowed here."));
         if (left.mult != 0) errs = errs.make(new ErrorSyntax(left.span(), "Multiplicity expression not allowed here."));

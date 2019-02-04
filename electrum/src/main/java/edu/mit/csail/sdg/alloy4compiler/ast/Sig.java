@@ -18,7 +18,9 @@ package edu.mit.csail.sdg.alloy4compiler.ast;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import edu.mit.csail.sdg.alloy4.ConstList;
 import edu.mit.csail.sdg.alloy4.ConstList.TempList;
@@ -166,7 +168,7 @@ public abstract class Sig extends Expr {
 	/** Constructs a new builtin PrimSig. */
 	// [HASLab] extended with variable sigs.
 	private Sig(String label) {
-		super(Pos.UNKNOWN, null);
+		super(Pos.UNKNOWN, null, new HashSet<Integer>()); // [HASLab] colorful electrum
 		Expr oneof = ExprUnary.Op.ONEOF.make(null, this);
 		ExprVar v = ExprVar.make(null, "this", oneof.type);
 		this.decl = new Decl(null, null, null, null, Util.asList(v), oneof);
@@ -187,14 +189,13 @@ public abstract class Sig extends Expr {
 
 	// [HASLab] extended with variable attribute
 	private Sig(Type type, String label, Attr... attributes) throws Err {
-		this(type,label,0,attributes);
+		this(type,label,new HashSet<Integer>(),attributes);
 	}
 
 	/** Constructs a new PrimSig or SubsetSig. */
 	// [HASLab] extended with variable attribute
-	private Sig(Type type, String label, int color, Attr... attributes) throws Err {
-		super(AttrType.WHERE.find(attributes), type);
-		this.color = color;
+	private Sig(Type type, String label, Set<Integer> color, Attr... attributes) throws Err {
+		super(AttrType.WHERE.find(attributes), type, color);
 		this.attributes = Util.asList(attributes);
 		Expr oneof = ExprUnary.Op.ONEOF.make(null, this);
 		ExprVar v = ExprVar.make(null, "this", oneof.type);
@@ -327,7 +328,7 @@ public abstract class Sig extends Expr {
 		}
 
 		public PrimSig (String label, PrimSig parent, Attr... attributes) throws Err {
-			this(label,parent,0,attributes);
+			this(label,parent,new HashSet<Integer>(),attributes);
 		}
 
 		/** Constructs a non-builtin sig.
@@ -339,7 +340,7 @@ public abstract class Sig extends Expr {
 		 * @throws ErrorSyntax if the signature has two or more multiplicities
 		 * @throws ErrorType if you attempt to extend the builtin sigs NONE, SIGINT, SEQIDX, or STRING
 		 */
-		public PrimSig (String label, PrimSig parent, int color, Attr... attributes) throws Err {
+		public PrimSig (String label, PrimSig parent, Set<Integer> color, Attr... attributes) throws Err {
 			super(((parent!=null && parent.isEnum!=null) ? parent.type : null), label,  color, Util.append(attributes, Attr.SUBSIG));
 			if (parent==SIGINT) throw new ErrorSyntax(pos, "sig "+label+" cannot extend the builtin \"Int\" signature");
 			if (parent==SEQIDX) throw new ErrorSyntax(pos, "sig "+label+" cannot extend the builtin \"seq/Int\" signature");
@@ -433,10 +434,10 @@ public abstract class Sig extends Expr {
 		 * @throws ErrorType if parents only contains NONE
 		 */
 		public SubsetSig(String label, Collection<Sig> parents, Attr... attributes) throws Err {
-			this(label,parents,0,attributes);
+			this(label,parents,new HashSet<Integer>(),attributes);
 		}
 
-		public SubsetSig(String label, Collection<Sig> parents, int color, Attr... attributes) throws Err {
+		public SubsetSig(String label, Collection<Sig> parents, Set<Integer> color, Attr... attributes) throws Err {
 			super(getType(label,parents), label, color, Util.append(attributes, Attr.SUBSET));
 			if (isEnum!=null) throw new ErrorType(pos, "Subset signature cannot be an enum.");
 			boolean exact = false;
@@ -499,7 +500,7 @@ public abstract class Sig extends Expr {
 
 		/** Constructs a new Field object. */
 		// [HASLab] extended with variable attribute, colorful electrum
-		private Field(Pos pos, Pos isPrivate, Pos isMeta, Pos isVar, Pos disjoint, Pos disjoint2, Sig sig, String label, Expr bound, int color) throws Err {
+		private Field(Pos pos, Pos isPrivate, Pos isMeta, Pos isVar, Pos disjoint, Pos disjoint2, Sig sig, String label, Expr bound, Set<Integer> color) throws Err {
 			super(pos, label, sig.type.product(bound.type), color); // [HASLab] colorful electrum
 			this.defined = bound.mult() == ExprUnary.Op.EXACTLYOF;
 			if (sig.builtin) throw new ErrorSyntax(pos, "Builtin sig \""+sig+"\" cannot have fields.");
@@ -576,8 +577,8 @@ public abstract class Sig extends Expr {
 		bound = bound.typecheck_as_set();
 		if (bound.ambiguous) bound = bound.resolve_as_set(null);
 		if (bound.mult==0 && bound.type.arity()==1) bound = ExprUnary.Op.ONEOF.make(null, bound); // If unary, and no multiplicity symbol, we assume it's oneOf
-		final Field f = new Field(null, null, null, null, null, null, this, label, bound, 0); // [HASLab] colorful electrum
-		final Decl d = new Decl(null, null, null, null, Arrays.asList(f), bound, 0); // [HASLab] colorful electrum
+		final Field f = new Field(null, null, null, null, null, null, this, label, bound, new HashSet<Integer>()); // [HASLab] colorful electrum
+		final Decl d = new Decl(null, null, null, null, Arrays.asList(f), bound, new HashSet<Integer>()); // [HASLab] colorful electrum
 		f.decl = d;
 		fields.add(d);
 		return f;
@@ -597,7 +598,7 @@ public abstract class Sig extends Expr {
 	 * @throws ErrorType    if the bound is not fully typechecked or is not a set/relation
 	 */
 	// [HASLab] extended with variable attribute, colorful electrum
-	public final Field[] addTrickyField (Pos pos, Pos isPrivate, Pos isDisjoint, Pos isDisjoint2, Pos isMeta, Pos isVar, String[] labels, Expr bound, int color) throws Err {
+	public final Field[] addTrickyField (Pos pos, Pos isPrivate, Pos isDisjoint, Pos isDisjoint2, Pos isMeta, Pos isVar, String[] labels, Expr bound, Set<Integer> color) throws Err {
 		bound = bound.typecheck_as_set();
 		if (bound.ambiguous) bound = bound.resolve_as_set(null);
 		if (bound.mult==0 && bound.type.arity()==1) bound = ExprUnary.Op.ONEOF.make(null, bound); // If unary, and no multiplicity symbol, we assume it's oneOf
@@ -627,8 +628,8 @@ public abstract class Sig extends Expr {
 		bound = bound.typecheck_as_set();
 		if (bound.ambiguous) bound = bound.resolve_as_set(null);
 		if (bound.mult() != ExprUnary.Op.EXACTLYOF) bound = ExprUnary.Op.EXACTLYOF.make(null, bound);
-		final Field f = new Field(pos, isPrivate, isMeta, null, null, null, this, label, bound, 0); // [HASLab] colorful electrum
-		final Decl d = new Decl(null, null, null, null, Arrays.asList(f), bound, 0); // [HASLab] colorful electrum
+		final Field f = new Field(pos, isPrivate, isMeta, null, null, null, this, label, bound, new HashSet<Integer>()); // [HASLab] colorful electrum
+		final Decl d = new Decl(null, null, null, null, Arrays.asList(f), bound, new HashSet<Integer>()); // [HASLab] colorful electrum
 		f.decl = d;
 		fields.add(d);
 		return f;

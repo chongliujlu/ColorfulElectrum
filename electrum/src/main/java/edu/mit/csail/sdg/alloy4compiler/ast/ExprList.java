@@ -19,7 +19,9 @@ import static edu.mit.csail.sdg.alloy4compiler.ast.Type.EMPTY;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import edu.mit.csail.sdg.alloy4.ConstList;
 import edu.mit.csail.sdg.alloy4.ConstList.TempList;
@@ -86,7 +88,7 @@ public final class ExprList extends Expr {
 
     /** Constructs an ExprList node. */
     // [HASLab] colorful electrum
-    private ExprList (Pos pos, Pos closingBracket, Op op, boolean ambiguous, ConstList<Expr> args, long weight, JoinableList<Err> errs, int color) {
+    private ExprList (Pos pos, Pos closingBracket, Op op, boolean ambiguous, ConstList<Expr> args, long weight, JoinableList<Err> errs, Set<Integer> color) {
         super(pos, closingBracket, ambiguous, Type.FORMULA, 0, weight, errs, color);
         this.op = op;
         this.args = args;
@@ -128,12 +130,12 @@ public final class ExprList extends Expr {
 
     // [HASLab] colorful electrum
     public static ExprList make(Pos pos, Pos closingBracket, Op op, List<? extends Expr> args) {
-    	return make(pos,closingBracket,op,args,0);
+    	return make(pos,closingBracket,op,args,new HashSet<Integer>());
     }
 
     /** Generates a call to a builtin predicate */
     // [HASLab] colorful electrum
-    public static ExprList make(Pos pos, Pos closingBracket, Op op, List<? extends Expr> args, int color) {
+    public static ExprList make(Pos pos, Pos closingBracket, Op op, List<? extends Expr> args, Set<Integer> color) {
         boolean ambiguous = false;
         JoinableList<Err> errs = emptyListOfErrors;
         TempList<Expr> newargs = new TempList<Expr>(args.size());

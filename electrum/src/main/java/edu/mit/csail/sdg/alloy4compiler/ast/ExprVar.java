@@ -17,7 +17,9 @@ package edu.mit.csail.sdg.alloy4compiler.ast;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import edu.mit.csail.sdg.alloy4.Err;
 import edu.mit.csail.sdg.alloy4.ErrorWarning;
@@ -42,7 +44,7 @@ public final class ExprVar extends ExprHasName {
 
     /** Constructs an ExprVar object */
     // [HASLab] colorful electrum
-    private ExprVar(Pos pos, String label, Type type, int color) {
+    private ExprVar(Pos pos, String label, Type type, Set<Integer> color) {
         super(pos, label, type, color); 
     }
 
@@ -51,12 +53,12 @@ public final class ExprVar extends ExprHasName {
      * @param label - the label for this variable (it is only used for pretty-printing and does not have to be unique)
      */
     public static ExprVar make(Pos pos, String label) {
-        return new ExprVar(pos, label, Type.EMPTY, 0); // [HASLab] colorful electrum
+        return new ExprVar(pos, label, Type.EMPTY, new HashSet<Integer>()); // [HASLab] colorful electrum
     }
     
     // [HASLab] colorful electrum
     public static ExprVar make(Pos pos, String label, Type type) {
-    	return make(pos,label,type,0);
+    	return make(pos,label,type,new HashSet<Integer>());
     }
 
     /** Constructs an ExprVar variable with the given type
@@ -65,7 +67,7 @@ public final class ExprVar extends ExprHasName {
      * @param type - the type
      */
     // [HASLab] colorful electrum
-    public static ExprVar make(Pos pos, String label, Type type, int color) {
+    public static ExprVar make(Pos pos, String label, Type type, Set<Integer> color) {
         return new ExprVar(pos, label, type, color);
     }
 
