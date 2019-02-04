@@ -165,9 +165,10 @@ public final class ExprCall extends Expr {
     //============================================================================================================//
 
     /** Constructs an ExprCall node with the given function "pred/fun" and the list of arguments "args". */
+    // [HASLab] colorful electrum
     private ExprCall (Pos pos, Pos closingBracket, boolean ambiguous, Type type,
-        Func fun, ConstList<Expr> args, long extraWeight, long weight, JoinableList<Err> errs) {
-        super(pos, closingBracket, ambiguous, type, 0, weight, errs);
+        Func fun, ConstList<Expr> args, long extraWeight, long weight, JoinableList<Err> errs, int color) {
+        super(pos, closingBracket, ambiguous, type, 0, weight, errs, color);
         this.fun = fun;
         this.args = args;
         this.extraWeight = extraWeight;
@@ -188,8 +189,15 @@ public final class ExprCall extends Expr {
 
     //============================================================================================================//
 
-    /** Constructs an ExprCall node with the given predicate/function "fun" and the list of arguments "args". */
+    // [HASLab] colorful electrum
     public static Expr make(Pos pos, Pos closingBracket, Func fun, List<Expr> args, long extraPenalty) {
+    	 return make(pos,closingBracket,fun,args,extraPenalty,0);
+    }
+    
+    
+    /** Constructs an ExprCall node with the given predicate/function "fun" and the list of arguments "args". */
+    // [HASLab] colorful electrum
+    public static Expr make(Pos pos, Pos closingBracket, Func fun, List<Expr> args, long extraPenalty, int color) {
         if (extraPenalty<0) extraPenalty = 0;
         if (args==null) args = ConstList.make();
         long weight = extraPenalty;
@@ -228,7 +236,7 @@ public final class ExprCall extends Expr {
                 t=tt; // Just in case an error occurred...
             }
         }
-        return new ExprCall(pos, closingBracket, ambiguous, t, fun, newargs.makeConst(), extraPenalty, weight, errs);
+        return new ExprCall(pos, closingBracket, ambiguous, t, fun, newargs.makeConst(), extraPenalty, weight, errs, color); // [HASLab] colorful electrum
     }
 
     //============================================================================================================//
@@ -250,7 +258,7 @@ public final class ExprCall extends Expr {
             //    +"if the argument has a tuple outside the parameter's type.\n"
             //    +"The argument has type "+y.type+"\nbut the parameter has type "+p));
         }
-        return changed ? make(pos, closingBracket, fun, args.makeConst(), extraWeight) : this;
+        return changed ? make(pos, closingBracket, fun, args.makeConst(), extraWeight, color) : this; // [HASLab] colorful electrum
     }
 
     //============================================================================================================//

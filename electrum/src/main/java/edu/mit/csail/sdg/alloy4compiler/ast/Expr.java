@@ -108,7 +108,8 @@ public abstract class Expr extends Browsable {
     *
     * @param errors - the list of errors associated with this Expr node (can be null if there are none)
     */
-   Expr (Pos pos, Pos closingBracket, boolean ambiguous, Type type, int mult, long weight, JoinableList<Err> errors) {
+   // [HASLab] colorful electrum
+   Expr (Pos pos, Pos closingBracket, boolean ambiguous, Type type, int mult, long weight, JoinableList<Err> errors, int color) {
 	  this.pos = (pos==null ? Pos.UNKNOWN : pos);
       this.closingBracket = (closingBracket==null ? Pos.UNKNOWN : closingBracket);
       this.ambiguous      = ambiguous;
@@ -119,6 +120,7 @@ public abstract class Expr extends Browsable {
       this.type   = (errors.size()>0 || type==null) ? EMPTY : type;
       this.weight = (weight>0) ? weight : 0;
       this.errors = errors;
+      this.color = color;
    }
 
    /** This must only be called by Sig's constructor. */

@@ -308,7 +308,7 @@ public final class CompModule extends Browsable implements Module {
 		@Override public Expr visit(ExprList x) throws Err {
 			TempList<Expr> temp = new TempList<Expr>(x.args.size());
 			for(int i=0; i<x.args.size(); i++)  temp.add(visitThis(x.args.get(i)));
-			return ExprList.make(x.pos, x.closingBracket, x.op, temp.makeConst());
+			return ExprList.make(x.pos, x.closingBracket, x.op, temp.makeConst(), x.color); // [HASLab] colorful electrum
 		}
 
 		/** {@inheritDoc} */
@@ -316,7 +316,7 @@ public final class CompModule extends Browsable implements Module {
 			Expr f = visitThis(x.cond);
 			Expr a = visitThis(x.left);
 			Expr b = visitThis(x.right);
-			return ExprITE.make(x.pos, f, a, b);
+			return ExprITE.make(x.pos, f, a, b, x.color); // [HASLab] colorful electrum
 		}
 
 		/** {@inheritDoc} */
@@ -347,7 +347,7 @@ public final class CompModule extends Browsable implements Module {
 				if (!left.errors.isEmpty() || !(right instanceof ExprChoice)) return x.op.make(x.pos, x.closingBracket, left, right);
 				return process(x.pos, x.closingBracket, right.pos, ((ExprChoice)right).choices, ((ExprChoice)right).reasons, left);
 			}
-			return x.op.make(x.pos, x.closingBracket, left, right);
+			return x.op.make(x.pos, x.closingBracket, left, right, x.color); // [HASLab] colorful electrum
 		}
 
 		/** {@inheritDoc} */
@@ -358,7 +358,7 @@ public final class CompModule extends Browsable implements Module {
 			put(left.label, left);
 			Expr sub = visitThis(x.sub);
 			remove(left.label);
-			return ExprLet.make(x.pos, left, right, sub);
+			return ExprLet.make(x.pos, left, right, sub, x.color); // [HASLab] colorful electrum
 		}
 
 		private boolean isOneOf(Expr x) {
@@ -423,7 +423,7 @@ public final class CompModule extends Browsable implements Module {
 			Expr sub = visitThis(x.sub);
 			if (x.op==ExprQt.Op.SUM) sub=sub.resolve_as_int(warns); else sub=sub.resolve_as_formula(warns);
 			for(Decl d: decls.makeConst()) for(ExprHasName v: d.names) remove(v.label);
-			return x.op.make(x.pos, x.closingBracket, decls.makeConst(), sub);
+			return x.op.make(x.pos, x.closingBracket, decls.makeConst(), sub, x.color); // [HASLab] colorful electrum
 		}
 
 		/** {@inheritDoc} */

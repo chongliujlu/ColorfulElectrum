@@ -499,7 +499,7 @@ public abstract class Sig extends Expr {
 		/** Constructs a new Field object. */
 		// [HASLab] extended with variable attribute
 		private Field(Pos pos, Pos isPrivate, Pos isMeta, Pos isVar, Pos disjoint, Pos disjoint2, Sig sig, String label, Expr bound) throws Err {
-			super(pos, label, sig.type.product(bound.type));
+			super(pos, label, sig.type.product(bound.type), 0); // [HASLab] colorful electrum
 			this.defined = bound.mult() == ExprUnary.Op.EXACTLYOF;
 			if (sig.builtin) throw new ErrorSyntax(pos, "Builtin sig \""+sig+"\" cannot have fields.");
 			if (!bound.errors.isEmpty()) throw bound.errors.pick();

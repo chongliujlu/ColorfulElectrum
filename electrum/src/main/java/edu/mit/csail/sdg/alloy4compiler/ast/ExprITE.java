@@ -74,8 +74,9 @@ public final class ExprITE extends Expr {
     }
 
     /** Constructs a ExprITE expression. */
-    private ExprITE(Pos pos, Expr cond, Expr left, Expr right, Type type, JoinableList<Err> errs) {
-        super(pos, null, (cond.ambiguous || left.ambiguous || (right!=null && right.ambiguous)), type, 0, cond.weight+left.weight+(right!=null ? right.weight : 0), errs);
+    // [HASLab] colorful electrum
+    private ExprITE(Pos pos, Expr cond, Expr left, Expr right, Type type, JoinableList<Err> errs, int color) {
+        super(pos, null, (cond.ambiguous || left.ambiguous || (right!=null && right.ambiguous)), type, 0, cond.weight+left.weight+(right!=null ? right.weight : 0), errs, color);
         this.cond = cond;
         this.left = left;
         this.right = right;
@@ -90,13 +91,19 @@ public final class ExprITE extends Expr {
         return cond.isSame(x.cond) && left.isSame(x.left) && right.isSame(x.right);
     }
 
+    // [HASLab] colorful electrum
+    public static Expr make(Pos pos, Expr cond, Expr left, Expr right) {
+    	return make(pos,cond,left,right,0);
+    }
+
     /** Constructs a ExprITE expression.
      *
      * @param cond - the condition formula
      * @param left - the then-clause
      * @param right - the else-clause
      */
-    public static Expr make(Pos pos, Expr cond, Expr left, Expr right) {
+    // [HASLab] colorful electrum
+    public static Expr make(Pos pos, Expr cond, Expr left, Expr right, int color) {
         JoinableList<Err> errs = emptyListOfErrors;
         if (cond.mult != 0) errs = errs.make(new ErrorSyntax(cond.span(), "Multiplicity expression not allowed here."));
         if (left.mult != 0) errs = errs.make(new ErrorSyntax(left.span(), "Multiplicity expression not allowed here."));
@@ -125,7 +132,7 @@ public final class ExprITE extends Expr {
             break;
         }
         cond = cond.typecheck_as_formula();
-        return new ExprITE(pos, cond, left, right, c, errs.make(cond.errors).make(left.errors).make(right.errors));
+        return new ExprITE(pos, cond, left, right, c, errs.make(cond.errors).make(left.errors).make(right.errors), color); // [HASLab] colorful electrum
     }
 
     /** {@inheritDoc} */
@@ -146,7 +153,7 @@ public final class ExprITE extends Expr {
         Expr cond = this.cond.resolve(Type.FORMULA, warns);
         Expr left = this.left.resolve(a, warns);
         Expr right = this.right.resolve(b, warns);
-        return (cond==this.cond && left==this.left && right==this.right) ? this : make(pos,cond,left,right);
+        return (cond==this.cond && left==this.left && right==this.right) ? this : make(pos,cond,left,right, color); // [HASLab] colorful electrum
     }
 
     /** {@inheritDoc} */

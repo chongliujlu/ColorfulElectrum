@@ -56,7 +56,7 @@ final class Macro extends ExprCustom {
 
     /** Construct a new Macro object. */
     private Macro(Pos pos, Pos isPrivate, CompModule realModule, String name, List<ExprVar> params, List<Expr> args, Expr body) {
-        super(pos, new ErrorFatal(pos, "Incomplete call on the macro \""+name+"\""));
+        super(pos, new ErrorFatal(pos, "Incomplete call on the macro \""+name+"\""), 0); // [HASLab] colorful electrum
         this.realModule = realModule;
         this.isPrivate = isPrivate;
         this.name = name;

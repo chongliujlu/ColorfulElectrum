@@ -42,7 +42,7 @@ public final class ExprVar extends ExprHasName {
 
     /** Constructs an ExprVar object */
     private ExprVar(Pos pos, String label, Type type) {
-        super(pos, label, type);
+        super(pos, label, type, 0); // [HASLab] colorful electrum
     }
 
     /** Constructs an ExprVar variable with the EMPTY type

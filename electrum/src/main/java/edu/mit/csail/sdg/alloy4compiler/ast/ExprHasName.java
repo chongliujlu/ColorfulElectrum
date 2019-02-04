@@ -25,8 +25,9 @@ public abstract class ExprHasName extends Expr {
     public final String label;
     
     /** Constructs an ExprHasName object */
-    ExprHasName(Pos pos, String label, Type type) {
-        super(pos, null, false, type, 0, 0, null);
+    // [HASLab] colorful electrum
+    ExprHasName(Pos pos, String label, Type type, int color) {
+        super(pos, null, false, type, 0, 0, null, color);
         this.label = (label==null ? "" : label);
     }
 

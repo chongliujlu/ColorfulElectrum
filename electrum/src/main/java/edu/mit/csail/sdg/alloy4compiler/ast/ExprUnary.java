@@ -90,11 +90,11 @@ public final class ExprUnary extends Expr {
     //============================================================================================================//
 
     /** Constructs an unary expression. */
+    // [HASLab] colorful electrum
     private ExprUnary(Pos pos, Op op, Expr sub, Type type, long weight, JoinableList<Err> errors, int color) {
-        super(pos, null, sub.ambiguous, type, (op==Op.EXACTLYOF||op==Op.SOMEOF||op==Op.LONEOF||op==Op.ONEOF||op==Op.SETOF)?1:0, weight, errors);
+        super(pos, null, sub.ambiguous, type, (op==Op.EXACTLYOF||op==Op.SOMEOF||op==Op.LONEOF||op==Op.ONEOF||op==Op.SETOF)?1:0, weight, errors, color);
         this.op = op;
         this.sub = sub;
-        this.color = color;
     }
 
     //============================================================================================================//
@@ -170,6 +170,7 @@ public final class ExprUnary extends Expr {
          * <br> Alloy4 does allow "variable : set (X lone-> Y)", where we ignore the word "set".
          * <br> (This desugaring is done by the ExprUnary.Op.make() method, so ExprUnary's constructor never sees it)
          */
+        // [HASLab] colorful electrum
         public final Expr make(Pos pos, Expr sub, Err extraError, long extraWeight, int color) {
             if (pos==null || pos==Pos.UNKNOWN) { if (this==NOOP) pos = sub.pos; else pos = sub.span(); }
             JoinableList<Err> errors = sub.errors.make(extraError);
@@ -239,7 +240,7 @@ public final class ExprUnary extends Expr {
                 type=SIGINT.type;
                 break;
             }
-            return new ExprUnary(pos, this, sub, type, extraWeight + sub.weight, errors.make(extraError), color);
+            return new ExprUnary(pos, this, sub, type, extraWeight + sub.weight, errors.make(extraError), color); // [HASLab] colorful electrum
         }
 
         /** Returns the human readable label for this operator */
@@ -289,7 +290,7 @@ public final class ExprUnary extends Expr {
         Expr sub = this.sub.resolve(s, warns);
         if (w1!=null) warns.add(w1);
         if (w2!=null) warns.add(w2);
-        return (sub==this.sub) ? this : op.make(pos, sub, null, weight-(this.sub.weight), color);
+        return (sub==this.sub) ? this : op.make(pos, sub, null, weight-(this.sub.weight), color); // [HASLab] colorful electrum
     }
 
     //============================================================================================================//

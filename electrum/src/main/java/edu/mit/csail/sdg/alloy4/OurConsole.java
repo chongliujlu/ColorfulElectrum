@@ -105,7 +105,7 @@ public final class OurConsole extends JScrollPane {
       StyleConstants.setBold(s, boldness);
       StyleConstants.setForeground(s, color);
       StyleConstants.setLeftIndent(s, leftIndent);
-//      s.removeAttribute("strike-color"); // [HASLab] colorful electrum, needed?
+      s.removeAttribute("strike-color"); // [HASLab] colorful electrum, needed?
       return s;
    }
 
@@ -114,15 +114,16 @@ public final class OurConsole extends JScrollPane {
    static MutableAttributeSet style(String fontName, int fontSize, boolean boldness, Color color, Set<Color> pos, Set<Color> neg, int leftIndent) {
       MutableAttributeSet s = style(fontName,fontSize,boldness,color,leftIndent);
       // [HASLab] colorful electrum, mix all positive colors
+      Color bg = new Color(255,255,255);
       if (!pos.isEmpty()) {
     	  int r = 0, g = 0, b = 0;
     	  for (Color c : pos) {
     		  r+=c.getRed(); g+=c.getGreen(); b+=c.getBlue();
     	  }
     	  int n = pos.size();
-    	  Color bg = new Color(Math.min(r/n, 255),Math.min(g/n, 255),Math.min(b/n, 255));
-    	  StyleConstants.setBackground(s, bg);
+    	  bg = new Color(Math.min(r/n, 255),Math.min(g/n, 255),Math.min(b/n, 255));
       }
+      StyleConstants.setBackground(s, bg);
 
 	  // [HASLab] colorful electrum, mix all negative colors
 	  if (!neg.isEmpty()) {
@@ -131,7 +132,7 @@ public final class OurConsole extends JScrollPane {
     		  r+=c.getRed(); g+=c.getGreen(); b+=c.getBlue();
     	  }
     	  int n = neg.size();
-    	  Color bg = new Color(Math.min(r/n, 255),Math.min(g/n, 255),Math.min(b/n, 255));
+    	  bg = new Color(Math.min(r/n, 255),Math.min(g/n, 255),Math.min(b/n, 255));
     	  s.addAttribute("strike-color", bg);
 	  } else {
     	  s.removeAttribute("strike-color");

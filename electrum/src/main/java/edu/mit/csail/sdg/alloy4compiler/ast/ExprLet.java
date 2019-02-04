@@ -74,8 +74,9 @@ public final class ExprLet extends Expr {
     //=============================================================================================================//
 
     /** Constructs a LET expression. */
-    private ExprLet(Pos pos, ExprVar var, Expr expr, Expr sub, JoinableList<Err> errs) {
-        super(pos, null, expr.ambiguous || sub.ambiguous, sub.type, 0, var.weight + expr.weight + sub.weight, errs);
+    // [HASLab] colorful electrum
+    private ExprLet(Pos pos, ExprVar var, Expr expr, Expr sub, JoinableList<Err> errs, int color) {
+        super(pos, null, expr.ambiguous || sub.ambiguous, sub.type, 0, var.weight + expr.weight + sub.weight, errs, color);
         this.var = var;
         this.expr = expr;
         this.sub = sub;
@@ -83,13 +84,19 @@ public final class ExprLet extends Expr {
 
     //=============================================================================================================//
 
+    // [HASLab] colorful electrum
+    public static Expr make(Pos pos, ExprVar var, Expr expr, Expr sub) {
+    	return make(pos,var,expr,sub,0);
+    }
+    
     /** Constructs a LET expression.
      *
      * @param pos - the position of the '=' token in the original Alloy model (or null if unknown)
      * @param var - the LET variable
      * @param sub - the body of the LET expression (which may or may not contain "var" as a free variable)
      */
-    public static Expr make(Pos pos, ExprVar var, Expr expr, Expr sub) {
+    // [HASLab] colorful electrum
+    public static Expr make(Pos pos, ExprVar var, Expr expr, Expr sub, int color) {
         if (expr.ambiguous) expr = expr.resolve(expr.type, null);
         JoinableList<Err> errs = var.errors.make(expr.errors).make(sub.errors);
         if (expr.mult!=0)
@@ -101,7 +108,7 @@ public final class ExprLet extends Expr {
                 var.type.is_bool != expr.type.is_bool ||
                 var.type.arity() != expr.type.arity())
                 errs = errs.make(new ErrorType(var.span(), "This variable has type "+var.type+" but is bound to a value of type "+expr.type));
-        return new ExprLet(pos, var, expr, sub, errs);
+        return new ExprLet(pos, var, expr, sub, errs, color); // [HASLab] colorful electrum
     }
 
     //=============================================================================================================//
@@ -112,7 +119,7 @@ public final class ExprLet extends Expr {
         // The var and expr are always already fully resolved, so we only need to resolve sub
         Expr newSub = sub.resolve(p, warns);
         if (warns!=null && !newSub.hasVar(var)) warns.add(new ErrorWarning(var.pos, "This variable is unused."));
-        return (sub==newSub) ? this : make(pos, var, expr, newSub);
+        return (sub==newSub) ? this : make(pos, var, expr, newSub, color); // [HASLab] colorful electrum
     }
 
     //=============================================================================================================//

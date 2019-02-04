@@ -126,8 +126,9 @@ public final class ExprQt extends Expr {
    //=============================================================================================================//
 
    /** Constructs a new quantified expression. */
-   private ExprQt (Pos pos, Pos closingBracket, Op op, Type type, ConstList<Decl> decls, Expr sub, boolean ambiguous, long weight, JoinableList<Err> errs) {
-      super(pos, closingBracket, ambiguous, type, 0, weight, errs);
+   // [HASLab] colorful electrum
+   private ExprQt (Pos pos, Pos closingBracket, Op op, Type type, ConstList<Decl> decls, Expr sub, boolean ambiguous, long weight, JoinableList<Err> errs, int color) {
+      super(pos, closingBracket, ambiguous, type, 0, weight, errs, color); // [HASLab] colorful electrum
       this.op = op;
       this.decls = decls;
       this.sub = sub;
@@ -151,6 +152,11 @@ public final class ExprQt extends Expr {
       /** The human readable label for this operator. */
       private final String label;
 
+      // [HASLab] colorful electrum
+      public final Expr make(Pos pos, Pos closingBracket, List<Decl> decls, Expr sub) {
+    	  return make(pos,closingBracket,decls,sub,0);
+      }
+      
       /** Constructs a quantification expression with "this" as the operator.
        *
        * @param pos - the position of the "quantifier" in the source file (or null if unknown)
@@ -158,7 +164,8 @@ public final class ExprQt extends Expr {
        * @param decls - the list of variable declarations (each variable must be over a set or relation)
        * @param sub - the body of the expression
        */
-      public final Expr make(Pos pos, Pos closingBracket, List<Decl> decls, Expr sub) {
+      // [HASLab] colorful electrum
+      public final Expr make(Pos pos, Pos closingBracket, List<Decl> decls, Expr sub, int color) {
          Type t = this==SUM ? Type.smallIntType() : (this==COMPREHENSION ? Type.EMPTY : Type.FORMULA);
          if (this!=SUM) sub = sub.typecheck_as_formula(); else sub = sub.typecheck_as_int();
          boolean ambiguous = sub.ambiguous;
@@ -197,7 +204,7 @@ public final class ExprQt extends Expr {
             }
          }
          if (errs.isEmpty()) errs = sub.errors; // if the vars have errors, then the subexpression's errors will be too confusing, so let's skip them
-         return new ExprQt(pos, closingBracket, this, t, ConstList.make(decls), sub, ambiguous, weight, errs);
+         return new ExprQt(pos, closingBracket, this, t, ConstList.make(decls), sub, ambiguous, weight, errs, color); // [HASLab] colorful electrum
       }
 
       /** Returns the human readable label for this operator */

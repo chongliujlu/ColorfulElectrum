@@ -83,16 +83,23 @@ public final class ExprChoice extends Expr {
     //============================================================================================================//
 
     /** Constructs an ExprChoice node. */
-    private ExprChoice(Pos pos, ConstList<Expr> choices, ConstList<String> reasons, Type type, long weight) {
-        super(pos, null, true, type, 0, weight, emptyListOfErrors.make(type==EMPTY ? complain(pos,choices) : null));
+    // [HASLab] colorful electrum
+    private ExprChoice(Pos pos, ConstList<Expr> choices, ConstList<String> reasons, Type type, long weight, int color) {
+        super(pos, null, true, type, 0, weight, emptyListOfErrors.make(type==EMPTY ? complain(pos,choices) : null), color);
         this.choices = choices;
         this.reasons = reasons;
     }
 
     //============================================================================================================//
 
-    /** Construct an ExprChoice node. */
+    // [HASLab] colorful electrum
     public static Expr make(Pos pos, ConstList<Expr> choices, ConstList<String> reasons) {
+    	return make(pos,choices,reasons,0);
+    }
+        
+    /** Construct an ExprChoice node. */
+    // [HASLab] colorful electrum
+    public static Expr make(Pos pos, ConstList<Expr> choices, ConstList<String> reasons, int color) {
         if (choices.size()==0) return new ExprBad(pos, "", new ErrorType(pos, "This expression failed to be typechecked."));
         if (choices.size()==1 && choices.get(0).errors.isEmpty()) return choices.get(0); // Shortcut
         Type type=EMPTY;
@@ -102,13 +109,14 @@ public final class ExprChoice extends Expr {
             type=x.type.merge(type);
             if (first || weight>x.weight) if (x.type!=EMPTY) { weight=x.weight; first=false; }
         }
-        return new ExprChoice(pos, choices, reasons, type, weight);
+        return new ExprChoice(pos, choices, reasons, type, weight, color);
     }
 
     //============================================================================================================//
 
     /** Resolve the list of choices, or return an ExprBad object containing the list of unresolvable ambiguities. */
-    private Expr resolveHelper(boolean firstPass, final Type t, List<Expr> choices, List<String> reasons, Collection<ErrorWarning> warns) {
+    // [HASLab] colorful electrum
+    private Expr resolveHelper(boolean firstPass, final Type t, List<Expr> choices, List<String> reasons, Collection<ErrorWarning> warns, int color) {
         List<Expr> ch = new ArrayList<Expr>(choices.size());
         List<String> re = new ArrayList<String>(choices.size());
         // We first prefer exact matches
@@ -147,7 +155,7 @@ public final class ExprChoice extends Expr {
             if (firstPass && ch.size()>1) {
                 ch2 = new ArrayList<Expr>(ch.size());
                 for(Expr c:ch) ch2.add(c.resolve(t, null));
-                return resolveHelper(false, t, ch2, re, warns);
+                return resolveHelper(false, t, ch2, re, warns, color);
             }
         }
         // If we are down to exactly 1 match, return it
@@ -164,7 +172,7 @@ public final class ExprChoice extends Expr {
             }
             Expr ans = Sig.NONE;
             while(arity>1) {ans=ans.product(Sig.NONE); arity--;}
-            return ExprUnary.Op.NOOP.make(span(), ans);
+            return ExprUnary.Op.NOOP.make(span(), ans, color);
         }
         // Otherwise, complain!
         String txt;
@@ -181,7 +189,7 @@ public final class ExprChoice extends Expr {
 
     /** {@inheritDoc} */
     @Override public Expr resolve(Type t, Collection<ErrorWarning> warns) {
-        if (errors.size()>0) return this; else return resolveHelper(true, t, choices, reasons, warns);
+        if (errors.size()>0) return this; else return resolveHelper(true, t, choices, reasons, warns, color); // [HASLab] colorful electrum
     }
 
     //============================================================================================================//

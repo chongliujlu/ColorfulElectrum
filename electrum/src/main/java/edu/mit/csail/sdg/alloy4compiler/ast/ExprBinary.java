@@ -62,6 +62,7 @@ public final class ExprBinary extends Expr {
    //============================================================================================================//
 
    /** Constructs a new ExprBinary node. */
+   // [HASLab] colorful electrum
    private ExprBinary(Pos pos, Pos closingBracket, Op op, Expr left, Expr right, Type type, JoinableList<Err> errors, int color) {
       super(pos,
             closingBracket,
@@ -69,11 +70,10 @@ public final class ExprBinary extends Expr {
             type,
             (op.isArrow && (left.mult==2 || right.mult==2 || op!=Op.ARROW))?2:0,
                   left.weight + right.weight,
-                  errors);
+                  errors, color);
       this.op = op;
       this.left = left;
       this.right = right;
-      this.color = color;
    }
 
    //============================================================================================================//
@@ -224,6 +224,7 @@ public final class ExprBinary extends Expr {
        * @param left - the left hand side expression
        * @param right - the right hand side expression
        */
+      // [HASLab] colorful electrum
       public final Expr make(Pos pos, Pos closingBracket, Expr left, Expr right, int color) {
          switch(this) {
            case AND: return ExprList.makeAND(pos, closingBracket, left, right);
@@ -328,7 +329,7 @@ public final class ExprBinary extends Expr {
             errs = errs.make(new ErrorSyntax(left.span(), "Multiplicity expression not allowed here."));
          if ((isArrow && right.mult==1) || (!isArrow && this!=Op.IN && right.mult!=0))
             errs = errs.make(new ErrorSyntax(right.span(), "Multiplicity expression not allowed here."));
-         return new ExprBinary(pos, closingBracket, this, left, right, type, errs.make(e), color);
+         return new ExprBinary(pos, closingBracket, this, left, right, type, errs.make(e), color); // [HASLab] colorful electrum
       }
 
       /** Returns the human readable label for this operator. */
@@ -509,7 +510,7 @@ public final class ExprBinary extends Expr {
       Expr left = this.left.resolve(a, warns);
       Expr right = this.right.resolve(b, warns);
       if (w!=null) warns.add(w);
-      return (left==this.left && right==this.right) ? this : op.make(pos, closingBracket, left, right, color);
+      return (left==this.left && right==this.right) ? this : op.make(pos, closingBracket, left, right, color); // [HASLab] colorful electrum
    }
 
    //============================================================================================================//
