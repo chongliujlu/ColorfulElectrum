@@ -888,7 +888,27 @@ Decla ::= VAR:v PRIVATE:p DISJ:k Names:a COLON DISJ:d          Expr:b  {: RESULT
 Decla ::= VAR:v PRIVATE:p        Names:a COLON DISJ:d          Expr:b  {: RESULT=new Decl(p,    null, d, v, a, mult(b)); :}; // [HASLab] variable decls
 Decla ::= VAR:v                  Names:a COLON DISJ:d          Expr:b  {: RESULT=new Decl(null, null, d, v, a, mult(b)); :}; // [HASLab] variable decls
 
-Declb ::= Decla:x {: RESULT=x; :};
+Declb ::= PFEAT1 Declb:x PFEAT1    {: RESULT = x.paint(1);   :}; // [HASLab] colorful electrum
+Declb ::= PFEAT2 Declb:x PFEAT2    {: RESULT = x.paint(2);   :}; // [HASLab] colorful electrum
+Declb ::= PFEAT3 Declb:x PFEAT3    {: RESULT = x.paint(3);   :}; // [HASLab] colorful electrum
+Declb ::= PFEAT4 Declb:x PFEAT4    {: RESULT = x.paint(4);   :}; // [HASLab] colorful electrum
+Declb ::= PFEAT5 Declb:x PFEAT5    {: RESULT = x.paint(5);   :}; // [HASLab] colorful electrum
+Declb ::= PFEAT6 Declb:x PFEAT6    {: RESULT = x.paint(6);   :}; // [HASLab] colorful electrum
+Declb ::= PFEAT7 Declb:x PFEAT7    {: RESULT = x.paint(7);   :}; // [HASLab] colorful electrum
+Declb ::= PFEAT8 Declb:x PFEAT8    {: RESULT = x.paint(8);   :}; // [HASLab] colorful electrum
+Declb ::= PFEAT9 Declb:x PFEAT9    {: RESULT = x.paint(9);   :}; // [HASLab] colorful electrum
+Declb ::= PFEAT0 Declb:x PFEAT0    {: RESULT = x.paint(0);   :}; // [HASLab] colorful electrum
+Declb ::= NFEAT1 Declb:x NFEAT1    {: RESULT = x.paint(-1);  :}; // [HASLab] colorful electrum
+Declb ::= NFEAT2 Declb:x NFEAT2    {: RESULT = x.paint(-2);  :}; // [HASLab] colorful electrum
+Declb ::= NFEAT3 Declb:x NFEAT3    {: RESULT = x.paint(-3);  :}; // [HASLab] colorful electrum
+Declb ::= NFEAT4 Declb:x NFEAT4    {: RESULT = x.paint(-4);  :}; // [HASLab] colorful electrum
+Declb ::= NFEAT5 Declb:x NFEAT5    {: RESULT = x.paint(-5);  :}; // [HASLab] colorful electrum
+Declb ::= NFEAT6 Declb:x NFEAT6    {: RESULT = x.paint(-6);  :}; // [HASLab] colorful electrum
+Declb ::= NFEAT7 Declb:x NFEAT7    {: RESULT = x.paint(-7);  :}; // [HASLab] colorful electrum
+Declb ::= NFEAT8 Declb:x NFEAT8    {: RESULT = x.paint(-8);  :}; // [HASLab] colorful electrum
+Declb ::= NFEAT9 Declb:x NFEAT9    {: RESULT = x.paint(-9);  :}; // [HASLab] colorful electrum
+Declb ::= NFEAT0 Declb:x NFEAT0    {: RESULT = x.paint(-0);  :}; // [HASLab] colorful electrum
+Declb ::=        Decla:x           {: RESULT=x; :};
 
 Declb ::=           PART:k Names   EQUALS          Expr    {: if (1==1) throw CompModule.hint(k, "part");                                      :};
 Declb ::=           EXH:k  Names   EQUALS          Expr    {: if (1==1) throw CompModule.hint(k, "exh");                                       :};

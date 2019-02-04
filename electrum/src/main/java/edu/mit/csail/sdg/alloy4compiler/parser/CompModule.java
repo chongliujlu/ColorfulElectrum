@@ -416,7 +416,7 @@ public final class CompModule extends Browsable implements Module {
 				// Above is a special case to allow more fine-grained typechecking when we see "all x:field$" or "some x:field$"
 				TempList<ExprVar> n = new TempList<ExprVar>(d.names.size());
 				for(ExprHasName v: d.names) n.add(ExprVar.make(v.pos, v.label, exp.type()));
-				Decl dd = new Decl(null, d.isPrivate, d.disjoint, d.disjoint2, n.makeConst(), exp);
+				Decl dd = new Decl(null, d.isPrivate, d.disjoint, d.disjoint2, n.makeConst(), exp, d.color);
 				for(ExprHasName newname: dd.names) put(newname.label, newname);
 				decls.add(dd);
 			}
@@ -429,7 +429,7 @@ public final class CompModule extends Browsable implements Module {
 		/** {@inheritDoc} */
 		@Override public Expr visit(ExprVar x) throws Err {
 			Expr obj = resolve(x.pos, x.label);
-			obj.paint(x.color); //[HASLab] colorful electrum
+			obj.paint(x.color); // [HASLab] colorful electrum
 			Expr res;
 			if (obj instanceof Macro) res = ((Macro)obj).instantiate(this, warns); else res = obj;
 			return res;
@@ -1358,7 +1358,7 @@ public final class CompModule extends Browsable implements Module {
 			Expr bound = cx.check(d.expr).resolve_as_set(warns);
 			cx.remove("this");
 			String[] names = new String[d.names.size()];  for(int i=0; i<names.length; i++) names[i] = d.names.get(i).label;
-			Field[] fields = s.addTrickyField(d.span(), d.isPrivate, d.disjoint, d.disjoint2, null, d.isVar, names, bound); // [HASLab]
+			Field[] fields = s.addTrickyField(d.span(), d.isPrivate, d.disjoint, d.disjoint2, null, d.isVar, names, bound, d.color); // [HASLab] , colorful electrum 
 		    final VisitQuery<Sig> q = new VisitQuery<Sig>() { // [HASLab]
 		      @Override public final Sig visit(Sig x) { if (x.isVariable!=null) return x; else return null; }
 		    };
