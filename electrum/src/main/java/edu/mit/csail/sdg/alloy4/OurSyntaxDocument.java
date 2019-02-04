@@ -92,7 +92,7 @@ class OurSyntaxDocument extends DefaultStyledDocument {
 
 	/** The character style for featured text. */
 	// [HASLab] colorful electrum
-	private final MutableAttributeSet styleColor(List<Integer> n, Color c) { return style(font, fontSize, true, new Color(c.getRed()-41,c.getGreen()-41,c.getBlue()-41), getPos(n), getNeg(n), 0); }
+	private final MutableAttributeSet styleColorMark(List<Integer> n, Color c) { return style(font, fontSize, true, new Color(c.getRed()-41,c.getGreen()-41,c.getBlue()-41), getPos(n), getNeg(n), 0); }
 
 	/** The character style for up-to-end-of-line-style comment. */
 	private final MutableAttributeSet styleComment = style(font, fontSize, false, new Color(0x0A940A), 0);  { all.add(styleComment); }
@@ -283,7 +283,7 @@ class OurSyntaxDocument extends DefaultStyledDocument {
 				if (isPositiveColor(c) && comment.get(c-O1+1) != 0) {comment.set(c-O1+1,0);opens=false;}
 				else if (isNegativeColor(c) && comment.get(c-E1+1) != 0) {comment.set(c-E1+1,0);opens=false;}
 				for (int k = 0; k < 6; k++) // paint the delimiters
-					if (c == (char) (O1+k) || c == (char) (E1+k)) setCharacterAttributes(oldi, i-oldi, styleColor(comment,C[k]), false);
+					if (c == (char) (O1+k) || c == (char) (E1+k)) setCharacterAttributes(oldi, i-oldi, styleColorMark(comment,C[k]), true);
 				// if not in style, apply
 				if (opens && isPositiveColor(c) && comment.get(c-O1+1) == 0) {comment.set(c-O1+1,1);}	
 				else if (opens && isNegativeColor(c) && comment.get(c-E1+1) == 0) {comment.set(c-E1+1,2);}

@@ -28,6 +28,9 @@ import edu.mit.csail.sdg.alloy4.Pos;
 
 public final class Decl {
 
+	public int color;
+   	public Decl paint(int c) {color=c;return this;}
+
     /** If nonnull, then this decl is private (and this.isPrivate is the location of the "private" keyword) */
     public final Pos isPrivate;
 
@@ -61,9 +64,14 @@ public final class Decl {
        return p;
     }
 
-    /** This constructs a declaration; the list of names must not be empty. */
-    // [HASLab]: extended with variable declarations for fields
+    // [HASLab] colorful electrum
     public Decl(Pos isVar, Pos isPrivate, Pos disjoint, Pos disjoint2, List<? extends ExprHasName> names, Expr expr) {
+    	this(isVar,isPrivate,disjoint,disjoint2,names,expr,0);
+    }
+
+    /** This constructs a declaration; the list of names must not be empty. */
+    // [HASLab]: extended with variable declarations for fields, colorful electrum
+    public Decl(Pos isVar, Pos isPrivate, Pos disjoint, Pos disjoint2, List<? extends ExprHasName> names, Expr expr, int color) {
        if (names.size()==0) throw new NullPointerException();
        this.isVar = isVar; // [HASLab]
        this.isPrivate = isPrivate;
@@ -71,6 +79,7 @@ public final class Decl {
        this.disjoint2 = disjoint2;
        this.names = ConstList.make(names);
        this.expr = expr;
+       this.color = color; // [HASLab] colorful electrum
     }
 
     /** Return the first variable in this declaration. */

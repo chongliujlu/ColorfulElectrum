@@ -325,7 +325,7 @@ public final class A4SolutionReader {
 			}
 		if (field == null)
 			field = parent.addTrickyField(Pos.UNKNOWN, isPrivate, null, null, isMeta, isVar, new String[] { label }, // [HASLab]
-					UNIV.join(type))[0];
+					UNIV.join(type),0)[0]; // [HASLab] colorful electrum
 		TupleSet ts = parseTuples(node, arity);
 		expr2ts.put(field, ts);
 		return field;

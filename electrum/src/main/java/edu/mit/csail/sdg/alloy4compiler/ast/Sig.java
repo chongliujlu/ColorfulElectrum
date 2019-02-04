@@ -185,6 +185,7 @@ public abstract class Sig extends Expr {
 		this.attributes = ConstList.make();
 	}
 
+	// [HASLab] extended with variable attribute
 	private Sig(Type type, String label, Attr... attributes) throws Err {
 		this(type,label,0,attributes);
 	}
@@ -497,9 +498,9 @@ public abstract class Sig extends Expr {
 		public Decl decl() { return decl; }
 
 		/** Constructs a new Field object. */
-		// [HASLab] extended with variable attribute
-		private Field(Pos pos, Pos isPrivate, Pos isMeta, Pos isVar, Pos disjoint, Pos disjoint2, Sig sig, String label, Expr bound) throws Err {
-			super(pos, label, sig.type.product(bound.type), 0); // [HASLab] colorful electrum
+		// [HASLab] extended with variable attribute, colorful electrum
+		private Field(Pos pos, Pos isPrivate, Pos isMeta, Pos isVar, Pos disjoint, Pos disjoint2, Sig sig, String label, Expr bound, int color) throws Err {
+			super(pos, label, sig.type.product(bound.type), color); // [HASLab] colorful electrum
 			this.defined = bound.mult() == ExprUnary.Op.EXACTLYOF;
 			if (sig.builtin) throw new ErrorSyntax(pos, "Builtin sig \""+sig+"\" cannot have fields.");
 			if (!bound.errors.isEmpty()) throw bound.errors.pick();
@@ -575,8 +576,8 @@ public abstract class Sig extends Expr {
 		bound = bound.typecheck_as_set();
 		if (bound.ambiguous) bound = bound.resolve_as_set(null);
 		if (bound.mult==0 && bound.type.arity()==1) bound = ExprUnary.Op.ONEOF.make(null, bound); // If unary, and no multiplicity symbol, we assume it's oneOf
-		final Field f = new Field(null, null, null, null, null, null, this, label, bound);
-		final Decl d = new Decl(null, null, null, null, Arrays.asList(f), bound);
+		final Field f = new Field(null, null, null, null, null, null, this, label, bound, 0); // [HASLab] colorful electrum
+		final Decl d = new Decl(null, null, null, null, Arrays.asList(f), bound, 0); // [HASLab] colorful electrum
 		f.decl = d;
 		fields.add(d);
 		return f;
@@ -595,14 +596,14 @@ public abstract class Sig extends Expr {
 	 * @throws ErrorSyntax  if the bound contains a predicate/function call
 	 * @throws ErrorType    if the bound is not fully typechecked or is not a set/relation
 	 */
-	// [HASLab] extended with variable attribute
-	public final Field[] addTrickyField (Pos pos, Pos isPrivate, Pos isDisjoint, Pos isDisjoint2, Pos isMeta, Pos isVar, String[] labels, Expr bound) throws Err {
+	// [HASLab] extended with variable attribute, colorful electrum
+	public final Field[] addTrickyField (Pos pos, Pos isPrivate, Pos isDisjoint, Pos isDisjoint2, Pos isMeta, Pos isVar, String[] labels, Expr bound, int color) throws Err {
 		bound = bound.typecheck_as_set();
 		if (bound.ambiguous) bound = bound.resolve_as_set(null);
 		if (bound.mult==0 && bound.type.arity()==1) bound = ExprUnary.Op.ONEOF.make(null, bound); // If unary, and no multiplicity symbol, we assume it's oneOf
 		final Field[] f = new Field[labels.length];
-		for(int i=0; i<f.length; i++) f[i] = new Field(pos, isPrivate, isMeta, isVar, isDisjoint, isDisjoint2, this, labels[i], bound); // [HASLab]
-		final Decl d = new Decl(isVar, isPrivate, isDisjoint, isDisjoint2, Arrays.asList(f), bound); // [HASLab]
+		for(int i=0; i<f.length; i++) f[i] = new Field(pos, isPrivate, isMeta, isVar, isDisjoint, isDisjoint2, this, labels[i], bound, color); // [HASLab] , colorful electrum
+		final Decl d = new Decl(isVar, isPrivate, isDisjoint, isDisjoint2, Arrays.asList(f), bound, color); // [HASLab] , colorful electrum
 		for(int i=0; i<f.length; i++) f[i].decl = d;
 		fields.add(d);
 		return f;
@@ -626,8 +627,8 @@ public abstract class Sig extends Expr {
 		bound = bound.typecheck_as_set();
 		if (bound.ambiguous) bound = bound.resolve_as_set(null);
 		if (bound.mult() != ExprUnary.Op.EXACTLYOF) bound = ExprUnary.Op.EXACTLYOF.make(null, bound);
-		final Field f = new Field(pos, isPrivate, isMeta, null, null, null, this, label, bound);
-		final Decl d = new Decl(null, null, null, null, Arrays.asList(f), bound);
+		final Field f = new Field(pos, isPrivate, isMeta, null, null, null, this, label, bound, 0); // [HASLab] colorful electrum
+		final Decl d = new Decl(null, null, null, null, Arrays.asList(f), bound, 0); // [HASLab] colorful electrum
 		f.decl = d;
 		fields.add(d);
 		return f;
