@@ -283,8 +283,8 @@ class OurSyntaxDocument extends DefaultStyledDocument {
 				i++;
 				boolean opens = true;
 				// if already with style, invert
-				if (isPositiveColor(c) && comment.get(c-O1+1) != 0) {comment.set(c-O1+1,0);opens=false;}
-				else if (isNegativeColor(c) && comment.get(c-E1+1) != 0) {comment.set(c-E1+1,0);opens=false;}
+				if (isPositiveColor(c) && comment.get(c-O1+1) == 1) {comment.set(c-O1+1,0);opens=false;}
+				else if (isNegativeColor(c) && comment.get(c-E1+1) == 2) {comment.set(c-E1+1,0);opens=false;}
 				for (int k = 0; k < 9; k++) // paint the delimiters
 					if (c == (char) (O1+k) || c == (char) (E1+k)) setCharacterAttributes(oldi, i-oldi, styleColorMark(comment,C[k]), true);
 				// if not in style, apply
