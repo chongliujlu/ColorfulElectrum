@@ -41,8 +41,9 @@ public final class ExprVar extends ExprHasName {
     }
 
     /** Constructs an ExprVar object */
-    private ExprVar(Pos pos, String label, Type type) {
-        super(pos, label, type, 0); // [HASLab] colorful electrum
+    // [HASLab] colorful electrum
+    private ExprVar(Pos pos, String label, Type type, int color) {
+        super(pos, label, type, color); 
     }
 
     /** Constructs an ExprVar variable with the EMPTY type
@@ -50,16 +51,22 @@ public final class ExprVar extends ExprHasName {
      * @param label - the label for this variable (it is only used for pretty-printing and does not have to be unique)
      */
     public static ExprVar make(Pos pos, String label) {
-        return new ExprVar(pos, label, Type.EMPTY);
+        return new ExprVar(pos, label, Type.EMPTY, 0); // [HASLab] colorful electrum
     }
     
+    // [HASLab] colorful electrum
+    public static ExprVar make(Pos pos, String label, Type type) {
+    	return make(pos,label,type,0);
+    }
+
     /** Constructs an ExprVar variable with the given type
      * @param pos - the original position in the source file (can be null if unknown)
      * @param label - the label for this variable (it is only used for pretty-printing and does not have to be unique)
      * @param type - the type
      */
-    public static ExprVar make(Pos pos, String label, Type type) {
-        return new ExprVar(pos, label, type);
+    // [HASLab] colorful electrum
+    public static ExprVar make(Pos pos, String label, Type type, int color) {
+        return new ExprVar(pos, label, type, color);
     }
 
     /** {@inheritDoc} */

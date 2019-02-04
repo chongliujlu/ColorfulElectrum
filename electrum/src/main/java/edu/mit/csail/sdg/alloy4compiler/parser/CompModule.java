@@ -415,7 +415,7 @@ public final class CompModule extends Browsable implements Module {
 				}
 				// Above is a special case to allow more fine-grained typechecking when we see "all x:field$" or "some x:field$"
 				TempList<ExprVar> n = new TempList<ExprVar>(d.names.size());
-				for(ExprHasName v: d.names) n.add(ExprVar.make(v.pos, v.label, exp.type()));
+				for(ExprHasName v: d.names) n.add(ExprVar.make(v.pos, v.label, exp.type(),d.color)); // [HASLab] colorful electrum 
 				Decl dd = new Decl(null, d.isPrivate, d.disjoint, d.disjoint2, n.makeConst(), exp, d.color);
 				for(ExprHasName newname: dd.names) put(newname.label, newname);
 				decls.add(dd);
